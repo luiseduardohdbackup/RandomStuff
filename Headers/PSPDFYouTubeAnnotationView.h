@@ -12,23 +12,29 @@
 
 @class PSPDFVideoAnnotationView, PSPDFAnnotation;
 
-/// Uses MPMoviePlayerController whenever possible, else falls back to the UIWebView YouTube plugin.
+/// Encapsulates the YouTube plugin of UIWebView
 /// Note: The YouTube plugin doesn't show up in the Simulator. Test on the device!
-@interface PSPDFYouTubeAnnotationView : PSPDFLinkAnnotationBaseView
+@interface PSPDFYouTubeAnnotationView : PSPDFLinkAnnotationBaseView <UIWebViewDelegate>
 
 /// Keep a reference at the annotation
-@property(nonatomic, strong) PSPDFAnnotation *annotation;
+@property (nonatomic, strong) PSPDFAnnotation *annotation;
 
 /// Access the original YouTube URL (e.g. http://www.youtube.com/watch?v=Vo0Cazxj_yc)
-@property(nonatomic, strong, readonly) NSURL *youTubeURL;
+@property (nonatomic, strong, readonly) NSURL *youTubeURL;
 
 /// Set if extracting the YouTube mp4 fails.
-@property(nonatomic, strong, readonly) NSError *error;
+@property (nonatomic, strong, readonly) NSError *error;
 
 /// YES to enable auto-start as soon as the view is loaded. Relayed to PSPDFVideoAnnotationView. Doesn't work with UIWebView.
-@property(nonatomic, assign, getter=isAutostartEnabled) BOOL autostartEnabled;
+@property (nonatomic, assign, getter=isAutostartEnabled) BOOL autostartEnabled;
 
 /// Used in the default implementation.
-@property (nonatomic, strong) UIWebView *webView;
+@property (nonatomic, strong) UIWebView *UIWebView;
+
+/// Control YouTube plugin -> play.
+- (void)play;
+
+/// Control YouTube plugin -> pause.
+- (void)pause;
 
 @end

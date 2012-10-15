@@ -25,27 +25,30 @@ typedef NS_ENUM(NSInteger, PSPDFSearchStatus) {
 extern NSUInteger kPSPDFMinimumSearchLength;
 
 /// pdf search controller.
-@interface PSPDFSearchViewController : UITableViewController <UISearchDisplayDelegate, UISearchBarDelegate, PSPDFCacheDelegate, PSPDFSearchDelegate, PSPDFStatusBarStyleHint>
+@interface PSPDFSearchViewController : UITableViewController <UISearchDisplayDelegate, UISearchBarDelegate, PSPDFCacheDelegate, PSPDFTextSearchDelegate, PSPDFStatusBarStyleHint>
 
 /// initializes controller.
 - (id)initWithDocument:(PSPDFDocument *)document pdfController:(PSPDFViewController *)pdfController;
 
 /// Current searchText. If set, keyboard is not shown
-@property(nonatomic, copy) NSString *searchText;
+@property (nonatomic, copy) NSString *searchText;
 
 /// different behavior depending on iPhone/iPad (on the iPhone, the controller is modal, else in a UIPopoverController)
 /// Note: this is set from PSPDFViewController in presentModalViewController:embeddedInNavigationController:withCloseButton:animated.
-@property(nonatomic, assign) BOOL showsCancelButton;
+@property (nonatomic, assign) BOOL showsCancelButton;
 
 /// search bar for controller.
 /// You can change attributes (e.g. barStyle) but don't change the delegate!
-@property(nonatomic, strong, readonly) UISearchBar *searchBar;
+@property (nonatomic, strong, readonly) UISearchBar *searchBar;
 
 /// Current search status. KVO ovserveable.
-@property(nonatomic, assign, readonly) PSPDFSearchStatus searchStatus;
+@property (nonatomic, assign, readonly) PSPDFSearchStatus searchStatus;
 
 /// Clears highlights when controller disappeares. Defaults to NO.
-@property(nonatomic, assign) BOOL clearHighlightsWhenClosed;
+@property (nonatomic, assign) BOOL clearHighlightsWhenClosed;
+
+/// Defaults to 600. A too high number will be slow.
+@property (nonatomic, assign) NSUInteger maximumNumberOfSearchResultsDisplayed;
 
 // Updates the search result cell. Can be subclassed.
 // To customize the label search the subvies for the PSPDFAttributedLabel class.
