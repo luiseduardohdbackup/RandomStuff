@@ -29,7 +29,7 @@
 @property (nonatomic, assign, getter=isAutostartEnabled) BOOL autostartEnabled;
 
 /// Used in the default implementation.
-@property (nonatomic, strong) UIWebView *UIWebView;
+@property (nonatomic, strong) UIWebView *webView;
 
 /// Control YouTube plugin -> play.
 - (void)play;
