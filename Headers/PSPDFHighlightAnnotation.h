@@ -21,14 +21,15 @@ typedef NS_ENUM(NSInteger, PSPDFHighlightAnnotationType) {
 /// Highlight subtype.
 @property (nonatomic, assign) PSPDFHighlightAnnotationType highlightType;
 
-/// Coordinates for highlight annotation.
+/// Coordinates for highlight annotation (boxed CGRect's)
 @property (nonatomic, strong) NSArray *rects;
 
-- (id)initWithAnnotationDictionary:(CGPDFDictionaryRef)annotDict inAnnotsArray:(CGPDFArrayRef)annotsArray;
+/// Helper that will query the associated PSPDFDocument to get the highlighted content.
+/// (Because we actually just write rects, it's not easy to get the underlying text)
+- (NSString *)highlightedString;
 
-- (id)initWithType:(PSPDFHighlightAnnotationType)annotationType;
-
-- (void)setType:(PSPDFHighlightAnnotationType)annotationType withDefaultColor:(BOOL)useDefaultColor;
+/// Designated initializer.
+- (id)initWithHighlightType:(PSPDFHighlightAnnotationType)annotationType;
 
 /// Converts "Highlight" into PSPDFHighlightAnnotationHighlight, etc
 + (PSPDFHighlightAnnotationType)highlightTypeFromTypeString:(NSString *)typeString;

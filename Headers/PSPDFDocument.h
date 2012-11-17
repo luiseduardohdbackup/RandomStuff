@@ -16,7 +16,7 @@
 
 typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
     PSPDFAnnotationSaveModeDisabled,
-    PSPDFAnnotationSaveModeExternalFile,
+    PSPDFAnnotationSaveModeExternalFile, // will use save/loadAnnotationsWithError of PSPDFAnnotationParser (override to ship your own)
     PSPDFAnnotationSaveModeEmbedded,
     PSPDFAnnotationSaveModeEmbeddedWithExternalFileAsFallback
 };
@@ -52,16 +52,19 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// For leading zeros, use the default printf syntax. (%04d = 0001)
 + (instancetype)PDFDocumentWithBaseURL:(NSURL *)baseURL fileTemplate:(NSString *)fileTemplate startPage:(NSInteger)startPage endPage:(NSInteger)endPage;
 
-- (id)init;
-- (id)initWithURL:(NSURL *)URL;
-- (id)initWithData:(NSData *)data;
-- (id)initWithDataArray:(NSArray *)data;
-- (id)initWithDataProvider:(CGDataProviderRef)dataProvider;
-- (id)initWithBaseURL:(NSURL *)basePath files:(NSArray *)files;
-- (id)initWithBaseURL:(NSURL *)basePath fileTemplate:(NSString *)fileTemplate startPage:(NSInteger)startPage endPage:(NSInteger)endPage;
+- (instancetype)init;
+- (instancetype)initWithURL:(NSURL *)URL;
+- (instancetype)initWithData:(NSData *)data;
+- (instancetype)initWithDataArray:(NSArray *)data;
+- (instancetype)initWithDataProvider:(CGDataProviderRef)dataProvider;
+- (instancetype)initWithBaseURL:(NSURL *)basePath files:(NSArray *)files;
+- (instancetype)initWithBaseURL:(NSURL *)basePath fileTemplate:(NSString *)fileTemplate startPage:(NSInteger)startPage endPage:(NSInteger)endPage;
+
+/// Compare.
+- (BOOL)isEqualToDocument:(PSPDFDocument *)otherDocument;
 
 /// Delegate. Used for annotation calls.
-@property (nonatomic, ps_weak) id<PSPDFDocumentDelegate> delegate;
+@property (nonatomic, weak) id<PSPDFDocumentDelegate> delegate;
 
 /// @name File Access / Modification
 
@@ -132,7 +135,7 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// See kPSPDFMetadataKeyTitle and the following defines for keys that might be set.
 /// It's possible that there are keys that don't have a PSPDFKit define.
 /// Loop the dictionary to find them all.
-@property (nonatomic, strong, readonly) NSDictionary *metadata;
+@property (nonatomic, copy, readonly) NSDictionary *metadata;
 
 /// For caching, provide a *UNIQUE* uid here. (Or clear cache after content changes for same uid. Appending content is no problem)
 @property (nonatomic, copy) NSString *UID;
@@ -147,9 +150,9 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
  Defines the annotations that can be edited (if annotationsEnabled is set to YES)
  Set this to an empty set to disable annotation editing/creation.
  
- Defaults to PSPDFAnnotationTypeStringHighlight, PSPDFAnnotationTypeStringUnderline, PSPDFAnnotationTypeStringStrikeout, PSDFAnnotationTypeStringNote, PSPDFAnnotationTypeStringInk, PSPDFAnnotationTypeStringFreeText
+ Defaults to all available STRING constants (PSPDFAnnotationTypeStringHighlight, PSPDFAnnotationTypeStringInk, etc).
 */
-@property (nonatomic, strong) NSSet *editableAnnotationTypes;
+@property (nonatomic, copy) NSSet *editableAnnotationTypes;
 
 /// Can PDF annotations be embedded?
 /// Note: only evaluates the first file if multiple files are set.
@@ -220,15 +223,12 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// (Essentially pageNumberForPage-1)
 - (NSUInteger)compensatedPageForPage:(NSUInteger)page;
 
-/// Returns YES of pageInfo for page is available
-- (BOOL)hasPageInfoForPage:(NSUInteger)page;
-
 /// Cached rotation and aspect ratio data for specific page. Page starts at 0.
+/// Override the methods in PSPDFDocumentProvider instead.
 - (PSPDFPageInfo *)pageInfoForPage:(NSUInteger)page;
 
-/// Cached rotation and aspect ratio data for specific page. Page starts at 0.
-/// You can override this if you need to manually change the rotation value of a page.
-- (PSPDFPageInfo *)pageInfoForPage:(NSUInteger)page pageRef:(CGPDFPageRef)pageRef;
+/// Returns YES of pageInfo for page is available
+- (BOOL)hasPageInfoForPage:(NSUInteger)page;
 
 /// Makes a search beginning from page 0 for the nearest pageInfo. Does not calculate/block the thread.
 - (PSPDFPageInfo *)nearestPageInfoForPage:(NSUInteger)page;
@@ -239,6 +239,10 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 
 /// Rotation for specified page. cached. Page starts at 0.
 - (int)rotationForPage:(NSUInteger)page;
+
+/// PDFBox that is used for rendering. Defaults to kCGPDFCropBox.
+/// Older versions of PSPDFKit used kCGPDFCropBox by default.
+@property (nonatomic, assign) CGPDFBox PDFBox;
 
 /// Scan the whole document and analyzes if the aspect ratio is equal or not.
 /// If this returns 0 or a very small value, it's perfectly suitable for pageCurl.
@@ -277,9 +281,10 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 @property (nonatomic, assign, getter=isAspectRatioEqual) BOOL aspectRatioEqual;
 
 /// If document is displayed, returns currently active pdfController. Don't set this yourself. Optimizes caching.
-// Note: doesn't use weak as this could lead to background deallocation of the controller.
-@property (nonatomic, unsafe_unretained) PSPDFViewController *displayingPdfController;
+@property (atomic, weak) PSPDFViewController *displayingPdfController;
 
+/// Currently displayed page. Updated by PSPDFViewController.
+@property (atomic, assign, readonly) NSUInteger displayingPage;
 
 /// @name Password Protection and Security
 
@@ -323,7 +328,7 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// Name of the encryption filter used, e.g. Adobe.APS. If this is set, the document can't be unlocked.
 /// See "Adobe LifeCycle DRM, http://www.adobe.com/products/livecycle/rightsmanagement
 /// Note: only evaluates the first file if multiple files are set.
-@property (nonatomic, assign, readonly) NSString *encryptionFilter;
+@property (nonatomic, copy, readonly) NSString *encryptionFilter;
 
 /// Has the PDF file been unlocked? (is it still locked?).
 /// Note: only evaluates the first file if multiple files are set.
@@ -340,12 +345,16 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// Return a textParser for the specific document page.
 - (PSPDFTextParser *)textParserForPage:(NSUInteger)page;
 
+/// Checks if the text parser has already been loaded.
+- (BOOL)hasLoadedTextParserForPage:(NSUInteger)page;
+
 /// If YES, any glyphs (text, words) that are outside the visible page area will not be parsed.
 /// Set early or call clearCache manually after changing this property. (since extracted text is cached)
 /// Defaults to YES.
 @property (nonatomic, assign) BOOL textParserHideGlyphsOutsidePageRect;
 
 /// Text extraction class for current document.
+/// Be careful where you're setting the delegate. You can also create a private PSPDFTextSearch class.
 @property (nonatomic, strong) PSPDFTextSearch *textSearch;
 
 /// Get the document provider for a specific page.
@@ -356,7 +365,7 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 - (NSUInteger)pageOffsetForDocumentProvider:(PSPDFDocumentProvider *)documentProvider;
 
 /// Get an array of documentProviers to easily manage documents with multiple files.
-@property (nonatomic, strong, readonly) NSArray *documentProviders;
+@property (nonatomic, copy, readonly) NSArray *documentProviders;
 
 /// Document Parser is per file, so might return the same parser for different pages.
 /// (But we need to check as a PSPDFDocument can contain multiple files)
@@ -397,21 +406,23 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// This is the perfect place to change the background fill color, e.g. you would do this for a black document:
 /// renderOptions = @{kPSPDFBackgroundFillColor : [UIColor blackColor]};
 /// This fixes tiny white/gray lines at the borders of a document that else might show up.
-@property (nonatomic, strong) NSDictionary *renderOptions;
+@property (nonatomic, copy) NSDictionary *renderOptions;
 
 /// @name Object Finder
 
 // options
-extern NSString *const kPSPDFObjectsText;        // Include Text.
-extern NSString *const kPSPDFObjectsFullWords;   // Always return full PSPDFWords. Implies kPSPDFObjectsText.
-extern NSString *const kPSPDFObjectsTextBlocks;  // Include text blocks, sorted after most appropriate.
-extern NSString *const kPSPDFObjectsTextBlocksIgnoreLarge;  // Ignore too large text blocks (that are > 90% of a page)
-extern NSString *const kPSPDFObjectsAnnotationTypes; // Include annotations of attached type
-extern NSString *const kPSPDFObjectsAnnotationPageBounds; // Special case; used for PSPDFAnnotationTypeNote hit testing.
+extern NSString *const kPSPDFObjectsText;                  // Include Text.
+extern NSString *const kPSPDFObjectsFullWords;             // Always return full PSPDFWords. Implies kPSPDFObjectsText.
+extern NSString *const kPSPDFObjectsTextBlocks;            // Include text blocks, sorted after most appropriate.
+extern NSString *const kPSPDFObjectsTextBlocksIgnoreLarge; // Ignore too large text blocks (that are > 90% of a page)
+extern NSString *const kPSPDFObjectsAnnotationTypes;       // Include annotations of attached type
+extern NSString *const kPSPDFObjectsAnnotationPageBounds;  // Special case; used for PSPDFAnnotationTypeNote hit testing.
+extern NSString *const kPSPDFObjectsSmartSort;             // Will sort words/annotations (smaller words/annots first). Use for touch detection.
 
 // Output categories
 extern NSString *const kPSPDFGlyphs;
 extern NSString *const kPSPDFWords;
+extern NSString *const kPSPDFText;
 extern NSString *const kPSPDFTextBlocks;
 extern NSString *const kPSPDFAnnotations;
 
@@ -432,13 +443,18 @@ extern NSString *const kPSPDFAnnotations;
 /// Use this to use specific subclasses instead of the default PSPDF* classes.
 /// e.g. add an entry of [PSPDFAnnotationParser class] / [MyCustomAnnotationParser class] as key/value pair to use the custom subclass. (MyCustomAnnotationParser must be a subclass of PSPDFAnnotationParser)
 /// Throws an exception if the overriding class is not a subclass of the overridden class.
+/// Hide the warning "Incompatible pointer types sending 'Class' to parameter of type 'id<NSCopying>' " with casting class to (id). It's perfectly safe to do so. Alternatively you can also use NSStrings.
 /// Note: does not get serialized when saved to disk.
-@property (nonatomic, strong) NSDictionary *overrideClassNames;
+@property (nonatomic, copy) NSDictionary *overrideClassNames;
 
 /// Hook to modify/return a different document provider. Called each time a documentProvider is created (which is usually on first access, and cached afterwards)
 /// During PSPDFDocument lifetime, document providers might be created at any time, lazily, and destroyed when memory is low.
 /// This might be used to change the delegate of the PSPDFDocumentProvider.
+/// Don't forget calling super on this!
 - (PSPDFDocumentProvider *)didCreateDocumentProvider:(PSPDFDocumentProvider *)documentProvider;
+
+/// Register a block that is called in didCreateDocumentProvider.
+- (void)setDidCreateDocumentProviderBlock:(void (^)(PSPDFDocumentProvider *documentProvider))block;
 
 /**
  Return URL to a thumbnail/full sized image (png; jpg preferred). Use this if you want to pre-supply rendered images.
@@ -469,6 +485,9 @@ extern NSString *const kPSPDFAnnotations;
 /// Default background color for pages. Can be overridden by subclassing backgroundColorForPage.
 /// Defaults to white.
 @property (nonatomic, strong) UIColor *backgroundColor;
+
+/// Helper for higher performance.
+- (PSPDFPageInfo *)pageInfoForPage:(NSUInteger)page pageRef:(CGPDFPageRef)pageRef;
 
 @end
 

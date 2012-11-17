@@ -35,12 +35,19 @@
 - (BOOL)becomeFirstResponder;
 
 /// Document. Can be changed.
-@property (nonatomic, ps_weak) PSPDFDocument *document;
+@property (nonatomic, weak) PSPDFDocument *document;
 
 /// Delegate to control the password unlock.
-@property (nonatomic, ps_weak) id<PSPDFPasswordViewDelegate> delegate;
+@property (nonatomic, weak) id<PSPDFPasswordViewDelegate> delegate;
 
 /// Shake if password is not accepted.
 @property (nonatomic, assign) BOOL shakeOnError;
+
+@end
+
+@interface PSPDFPasswordView (SubclassingHooks)
+
+/// Password text field.
+@property (nonatomic, strong, readonly) UITextField *passwordField;
 
 @end

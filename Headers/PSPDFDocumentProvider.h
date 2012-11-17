@@ -7,7 +7,7 @@
 
 #import "PSPDFKitGlobal.h"
 
-@class PSPDFTextSearch, PSPDFTextParser, PSPDFDocumentParser, PSPDFOutlineParser, PSPDFAnnotationParser, PSPDFDocumentProvider, PSPDFLabelParser, PSPDFDocument;
+@class PSPDFTextSearch, PSPDFTextParser, PSPDFDocumentParser, PSPDFOutlineParser, PSPDFAnnotationParser, PSPDFDocumentProvider, PSPDFLabelParser, PSPDFDocument, PSPDFPageInfo;
 
 /// Delegate for writing annotations. 
 @protocol PSPDFDocumentProviderDelegate <NSObject>
@@ -15,6 +15,7 @@
 @optional
 
 /// Called before we append data to a PDF. Return NO to stop writing annotations.
+/// Defaults to YES if not implemented, and will set a new NSData object.
 - (BOOL)documentProvider:(PSPDFDocumentProvider *)documentProvider shouldAppendData:(NSData *)data;
 
 // Called after the write is completed.
@@ -51,10 +52,10 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 - (NSData *)dataRepresentationWithError:(NSError **)error;
 
 /// Weak-linked parent document.
-@property (nonatomic, ps_weak, readonly) PSPDFDocument *document;
+@property (nonatomic, weak, readonly) PSPDFDocument *document;
 
 /// Delegate for writing annotations. Is set to PSPDFDocument per default.
-@property (nonatomic, ps_weak) id<PSPDFDocumentProviderDelegate> delegate;
+@property (nonatomic, weak) id<PSPDFDocumentProviderDelegate> delegate;
 
 /// Access the CGPDFDocumentRef and locks the internal document. 
 ///
@@ -83,6 +84,9 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 /// This force-clears the cache.
 - (void)flushDocumentReference;
 
+/// Cached rotation and aspect ratio data for specific page. Page starts at 0.
+- (PSPDFPageInfo *)pageInfoForPage:(NSUInteger)page;
+
 /// Number of pages in the PDF. Nil if source is invalid.
 @property (nonatomic, assign, readonly) NSUInteger pageCount;
 
@@ -104,7 +108,7 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 
 /// Name of the encryption filter used, e.g. Adobe.APS. If this is set, the document can't be unlocked.
 /// See "Adobe LifeCycle DRM, http://www.adobe.com/products/livecycle/rightsmanagement
-@property (nonatomic, assign, readonly) NSString *encryptionFilter;
+@property (nonatomic, copy, readonly) NSString *encryptionFilter;
 
 /// Has the PDF file been unlocked? (is it still locked?).
 @property (nonatomic, assign, readonly) BOOL isLocked;
@@ -116,7 +120,7 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 - (BOOL)saveChangedAnnotationsWithError:(NSError **)error;
 
 /// Access the PDF metadata. (might be a slow operation)
-@property (nonatomic, strong, readonly) NSDictionary *metadata;
+@property (nonatomic, copy, readonly) NSDictionary *metadata;
 
 /// Return YES if metadata is already parsed.
 @property (nonatomic, assign, readonly, getter=isMetadataLoaded) BOOL metadataLoaded;
@@ -134,11 +138,13 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 
 /// Outline extraction class for current PDF.
 /// Lazy initialized. Can be subclassed or set externally.
+/// If you set this externally, do this ONLY in your subclass of PSPDFDocument in didCreateDocumentProvider:.
 @property (nonatomic, strong) PSPDFOutlineParser *outlineParser;
 
 /// PDF parser that lists the PDF XRef structure and writes annotations.
 /// Lazy initialized. Can be subclassed or set externally.
 /// Parses the PDF on first access. Might be slow.
+/// If you set this externally, do this ONLY in your subclass of PSPDFDocument in didCreateDocumentProvider:.
 @property (nonatomic, strong) PSPDFDocumentParser *documentParser;
 
 /// Determine if lazy-loaded documentParser is already available.
@@ -146,10 +152,12 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 
 /// Link annotation parser class for current PDF.
 /// Lazy initialized. Can be subclassed or set externally.
+/// If you set this externally, do this ONLY in your subclass of PSPDFDocument in didCreateDocumentProvider:.
 @property (nonatomic, strong) PSPDFAnnotationParser *annotationParser;
 
 /// Page labels found in the current PDF.
 /// Lazy initialized. Can be subclassed or set externally.
+/// If you set this externally, do this ONLY in your subclass of PSPDFDocument in didCreateDocumentProvider:.
 @property (nonatomic, strong) PSPDFLabelParser *labelParser;
 
 @end
@@ -160,5 +168,12 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 @property (nonatomic, strong) NSData *data;
 
 @property (nonatomic, assign, readonly) BOOL hasOpenDocumentRef;
+
+/// Queries the PageInfo, but doesn't fetch new data.
+- (PSPDFPageInfo *)pageInfoForPageNoFetching:(NSUInteger)page;
+
+/// Cached rotation and aspect ratio data for specific page. Page starts at 0.
+/// You can override this if you need to manually change the rotation value of a page.
+- (PSPDFPageInfo *)pageInfoForPage:(NSUInteger)page pageRef:(CGPDFPageRef)pageRef;
 
 @end

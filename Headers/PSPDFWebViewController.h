@@ -28,7 +28,11 @@ typedef NS_ENUM(NSUInteger, PSPDFWebViewControllerAvailableActions) {
     PSPDFWebViewControllerAvailableActionsOpenInSafari     = 1 << 0,
     PSPDFWebViewControllerAvailableActionsMailLink         = 1 << 1,
     PSPDFWebViewControllerAvailableActionsCopyLink         = 1 << 2,
-    PSPDFWebViewControllerAvailableActionsPrint            = 1 << 3
+    PSPDFWebViewControllerAvailableActionsPrint            = 1 << 3,
+    PSPDFWebViewControllerAvailableActionsStopReload       = 1 << 4,
+    PSPDFWebViewControllerAvailableActionsBack             = 1 << 5,
+    PSPDFWebViewControllerAvailableActionsForward          = 1 << 6,
+    PSPDFWebViewControllerAvailableActionsAll              = 0xFFFFFF
 };
 
 /// Inline Web Browser.
@@ -52,7 +56,7 @@ typedef NS_ENUM(NSUInteger, PSPDFWebViewControllerAvailableActions) {
 @property (nonatomic, strong) UIPopoverController *popoverController;
 
 /// Associated delegate, connects to the PSPDFViewController
-@property (nonatomic, ps_weak) id<PSPDFWebViewControllerDelegate> delegate;
+@property (nonatomic, weak) id<PSPDFWebViewControllerDelegate> delegate;
 
 /// Defaults to YES. Will be checked in the default implementation of setActivityIndicatorEnabled.
 /// Set to NO to NOT change the global network activity indicator.

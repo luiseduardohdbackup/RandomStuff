@@ -58,7 +58,7 @@ typedef NS_ENUM(NSInteger, PSPDFSize) {
 - (UIImage *)cachedImageForDocument:(PSPDFDocument *)document page:(NSUInteger)page size:(PSPDFSize)size preload:(BOOL)preload;
 
 /// Renders image of a page for specified size.
-- (UIImage *)renderImageForDocument:(PSPDFDocument *)document page:(NSUInteger)page size:(PSPDFSize)size pdfPage:(CGPDFPageRef)pdfPage;
+- (UIImage *)renderImageForDocument:(PSPDFDocument *)document page:(NSUInteger)page size:(PSPDFSize)size PDFPage:(CGPDFPageRef)pdfPage;
 
 // TODO was used in tiling view
 /// save native rendered image, then call delegate.
@@ -96,7 +96,8 @@ typedef NS_ENUM(NSInteger, PSPDFSize) {
 - (BOOL)resumeCachingForService:(id)service;
 
 /// Clear cache for a specific document, optionally also deletes referenced document files. Operation is synchronous.
-/// Will also delete all metadata in document.cacheDirectory
+/// Will also delete all metadata in document.cacheDirectory.
+/// Can only delete document if document uses a file-based URL.
 - (BOOL)removeCacheForDocument:(PSPDFDocument *)document deleteDocument:(BOOL)deleteDocument error:(NSError **)error;
 
 /// Clear whole (disk) cache directory. May lock until related async tasks are finished. Can be called from any thread.

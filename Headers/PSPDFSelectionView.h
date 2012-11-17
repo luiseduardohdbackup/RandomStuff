@@ -35,6 +35,13 @@
 - (id)initWithFrame:(CGRect)frame delegate:(id<PSPDFSelectionViewDelegate>)delegate;
 
 /// Selection View delegate.
-@property (nonatomic, ps_weak) id<PSPDFSelectionViewDelegate> delegate;
+@property (nonatomic, weak) id<PSPDFSelectionViewDelegate> delegate;
+
+/// Allows to mark an array of CGRects on the view. rects and rawRects are mutually exclusive and will nil out each other.
+@property (nonatomic, strong) NSArray *rects;
+
+/// Faster variant that takes a C rect array. Will take ownership and free up memory after usage.
+/// rects and rawRects are mutually exclusive and will nil out each other.
+- (void)setRawRects:(CGRect *)rawRects count:(NSUInteger)count;
 
 @end

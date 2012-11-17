@@ -20,7 +20,7 @@
 - (id)initWithDocumentProvider:(PSPDFDocumentProvider *)documentProvider;
 
 /// Attached document provider.
-@property (nonatomic, ps_weak, readonly) PSPDFDocumentProvider *documentProvider;
+@property (nonatomic, weak, readonly) PSPDFDocumentProvider *documentProvider;
 
 /// Parse document, returns labels (NSStrings)
 - (NSDictionary *)parseDocument;
@@ -34,6 +34,6 @@
 
 /// Returns page labels. Starts parsing if labels are not yet created.
 /// NSNumber -> NSString
-@property (nonatomic, strong, readonly) NSDictionary *labels;
+@property (nonatomic, copy, readonly) NSDictionary *labels;
 
 @end

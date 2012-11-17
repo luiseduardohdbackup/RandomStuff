@@ -10,10 +10,10 @@
 @class PSPDFWord, PSPDFDocument;
 
 /// Search result object.
-@interface PSPDFSearchResult : NSObject
+@interface PSPDFSearchResult : NSObject <NSCopying, NSCoding>
 
 /// Referenced document.
-@property (nonatomic, ps_weak) PSPDFDocument *document;
+@property (nonatomic, weak) PSPDFDocument *document;
 
 /// referenced page.
 @property (nonatomic, assign) NSUInteger pageIndex;
@@ -32,5 +32,8 @@
 
 /// Cached title of the outline chapter. Will be added dynamically on first access.
 @property (nonatomic, copy) NSString *cachedOutlineTitle;
+
+/// Compare.
+- (BOOL)isEqualToSearchResult:(PSPDFSearchResult *)otherSearchResult;
 
 @end

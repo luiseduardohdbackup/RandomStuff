@@ -14,7 +14,7 @@ extern CGSize kPSPDFNoteAnnotationViewFixedSize;
 @interface PSPDFNoteAnnotation : PSPDFAnnotation
 
 /// Icon name.
-@property (nonatomic, strong) NSString *iconName;
+@property (nonatomic, copy) NSString *iconName;
 
 /// Designated initializer.
 - (id)initWithAnnotationDictionary:(CGPDFDictionaryRef)annotDict inAnnotsArray:(CGPDFArrayRef)annotsArray;

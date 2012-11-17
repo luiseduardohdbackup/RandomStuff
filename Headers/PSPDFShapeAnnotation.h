@@ -16,6 +16,9 @@ typedef NS_ENUM(NSInteger, PSPDFShapeAnnotationType) {
 /// PDF Shape Annotation.
 @interface PSPDFShapeAnnotation : PSPDFAnnotation
 
+/// Designated initializer.
+- (id)initWithShapeType:(PSPDFShapeAnnotationType)shapeType;
+
 /// Shape type.
 @property (nonatomic, assign) PSPDFShapeAnnotationType shapeType;
 
