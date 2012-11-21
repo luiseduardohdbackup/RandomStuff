@@ -25,15 +25,6 @@
 /// All glyphs merged together in the smallest possible bounding box.
 @property (nonatomic, assign) CGRect frame;
 
-/// Frame with applied pageTransform rotation. Use this to convert to view coordinate space.
-@property (nonatomic, assign, readonly) CGRect rotatedFrame;
-
-/// Page rotation transform (will be CGAffineTransformIdentity for most documents)
-@property (nonatomic, assign) CGAffineTransform pageRotationTransform;
-
-/// Frame without pageRotation.
-@property (nonatomic, assign) CGRect unrotatedFrame;
-
 /// All PSPDFGlyph objects
 @property (nonatomic, copy) NSArray *glyphs;
 

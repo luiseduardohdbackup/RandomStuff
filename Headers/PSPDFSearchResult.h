@@ -7,13 +7,10 @@
 
 #import "PSPDFKitGlobal.h"
 
-@class PSPDFWord, PSPDFDocument;
+@class PSPDFTextBlock, PSPDFDocument;
 
 /// Search result object.
 @interface PSPDFSearchResult : NSObject <NSCopying, NSCoding>
-
-/// Referenced document.
-@property (nonatomic, weak) PSPDFDocument *document;
 
 /// referenced page.
 @property (nonatomic, assign) NSUInteger pageIndex;
@@ -21,8 +18,9 @@
 /// preview text snippet.
 @property (nonatomic, copy) NSString *previewText;
 
-/// Text coordinates. May not be set, expensive calculation.
-@property (nonatomic, strong) PSPDFWord *selection;
+/// Text coordinates. Usually the text block contains only one word,
+/// Unless the search is split across two lines.
+@property (nonatomic, strong) PSPDFTextBlock *selection;
 
 /// Range within full page text.
 @property (nonatomic, assign) NSRange range;
@@ -32,6 +30,9 @@
 
 /// Cached title of the outline chapter. Will be added dynamically on first access.
 @property (nonatomic, copy) NSString *cachedOutlineTitle;
+
+/// Referenced document.
+@property (nonatomic, weak) PSPDFDocument *document;
 
 /// Compare.
 - (BOOL)isEqualToSearchResult:(PSPDFSearchResult *)otherSearchResult;

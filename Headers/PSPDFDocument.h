@@ -411,13 +411,16 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// @name Object Finder
 
 // options
+extern NSString *const kPSPDFObjectsGlyphs;                // Search glyphs.
 extern NSString *const kPSPDFObjectsText;                  // Include Text.
 extern NSString *const kPSPDFObjectsFullWords;             // Always return full PSPDFWords. Implies kPSPDFObjectsText.
 extern NSString *const kPSPDFObjectsTextBlocks;            // Include text blocks, sorted after most appropriate.
 extern NSString *const kPSPDFObjectsTextBlocksIgnoreLarge; // Ignore too large text blocks (that are > 90% of a page)
 extern NSString *const kPSPDFObjectsAnnotationTypes;       // Include annotations of attached type
 extern NSString *const kPSPDFObjectsAnnotationPageBounds;  // Special case; used for PSPDFAnnotationTypeNote hit testing.
+extern NSString *const kPSPDFObjectsImages;                // Include Image info.
 extern NSString *const kPSPDFObjectsSmartSort;             // Will sort words/annotations (smaller words/annots first). Use for touch detection.
+extern NSString *const kPSPDFObjectsFindFirstOnly;         // Will stop after finding the first maching object.
 
 // Output categories
 extern NSString *const kPSPDFGlyphs;
@@ -425,6 +428,7 @@ extern NSString *const kPSPDFWords;
 extern NSString *const kPSPDFText;
 extern NSString *const kPSPDFTextBlocks;
 extern NSString *const kPSPDFAnnotations;
+extern NSString *const kPSPDFImages;
 
 /// Find objects at the current PDF point.
 /// If options is nil, we assume kPSPDFObjectsText and kPSPDFObjectsFullWords.

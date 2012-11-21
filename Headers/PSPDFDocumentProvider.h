@@ -73,8 +73,10 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 /// Iterate over all CGPDFPageRef pages. pageNumber starts at 1.
 - (void)iterateOverPageRef:(void(^)(PSPDFDocumentProvider *provider, CGPDFDocumentRef documentRef, CGPDFPageRef pageRef, NSUInteger page))pageRefBlock;
 
+
 /// Requests a page for the current loaded document. Needs to be returned in releasePageRef.
 /// pageNumber starts at 1.
+- (CGPDFPageRef)requestPageRefForPageNumber:(NSUInteger)page error:(NSError **)error;
 - (CGPDFPageRef)requestPageRefForPageNumber:(NSUInteger)page;
 
 /// Releases a page reference. 

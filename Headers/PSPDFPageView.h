@@ -11,7 +11,7 @@
 #import "PSPDFLongPressGestureRecognizer.h"
 
 @protocol PSPDFAnnotationView;
-@class PSPDFPageInfo, PSPDFScrollView, PSPDFDocument, PSPDFViewController, PSPDFTextParser, PSPDFTextSelectionView, PSPDFAnnotation, PSPDFRenderStatusView, PSPDFNoteAnnotation, PSPDFOrderedDictionary;
+@class PSPDFPageInfo, PSPDFScrollView, PSPDFDocument, PSPDFViewController, PSPDFTextParser, PSPDFTextSelectionView, PSPDFAnnotation, PSPDFRenderStatusView, PSPDFNoteAnnotation, PSPDFOrderedDictionary, PSPDFNoteAnnotationController;
 
 /// Send this event to hide any selections, menus or other interactive page elements.
 extern NSString *const kPSPDFHidePageHUDElements;
@@ -86,19 +86,26 @@ extern NSString *const kPSPDFHidePageHUDElements;
 
 /// @name Coordinate calculations and object fetching
 
-/// Convert a view point to the corresponding pdf point.
+/// Convert a view point to the corresponding PDF point.
 /// pageBounds usually is PSPDFPageView bounds.
 - (CGPoint)convertViewPointToPDFPoint:(CGPoint)viewPoint;
 
-/// Convert a pdf point to the corresponding view point.
+/// Convert a PDF point to the corresponding view point.
 /// pageBounds usually is PSPDFPageView bounds.
 - (CGPoint)convertPDFPointToViewPoint:(CGPoint)pdfPoint;
 
 /// Convert a view rect to the corresponding pdf rect.
 - (CGRect)convertViewRectToPDFRect:(CGRect)viewRect;
 
-/// Convert a pdf rect to the corresponding view rect
+/// Convert a PDF rect to the corresponding view rect
 - (CGRect)convertPDFRectToViewRect:(CGRect)pdfRect;
+
+/// Convert a PDF glyph rect to the corresponding view rect.
+/// (Glyphs are not rotated on parsing to preserve reading direction, thus need to be converted differently than e.g. annotations)
+- (CGRect)convertGlyphRectToViewRect:(CGRect)glyphRect;
+
+/// Convert a view rect to PDF glyph rect.
+- (CGRect)convertViewRectToGlyphRect:(CGRect)viewRect;
 
 /// Get the glyphs/words on a specific page.
 - (NSDictionary *)objectsAtPoint:(CGPoint)pdfPoint options:(NSDictionary *)options;
@@ -186,7 +193,7 @@ extern NSString *const kPSPDFHidePageHUDElements;
 - (void)showMenuForAnnotation:(PSPDFAnnotation *)annotation animated:(BOOL)animated;
 
 /// Shows a popover/modal controller to edit a PSPDFAnnotation.
-- (void)showNoteControllerForAnnotation:(PSPDFAnnotation *)annotation animated:(BOOL)animated;
+- (PSPDFNoteAnnotationController *)showNoteControllerForAnnotation:(PSPDFAnnotation *)annotation showKeyboard:(BOOL)showKeyboard animated:(BOOL)animated;
 
 /**
  In PSPDFKit, annotations are managed in two ways:

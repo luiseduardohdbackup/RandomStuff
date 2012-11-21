@@ -8,7 +8,7 @@
 #import "PSPDFKitGlobal.h"
 #import "PSPDFResizableView.h"
 
-@class PSPDFTextParser, PSPDFWord, PSPDFPageView, PSPDFHighlightAnnotation, PSPDFLinkAnnotation, PSPDFAnnotation, PSPDFNoteAnnotation, PSPDFLoupeView, PSPDFLongPressGestureRecognizer;
+@class PSPDFTextParser, PSPDFWord, PSPDFImageInfo, PSPDFPageView, PSPDFHighlightAnnotation, PSPDFLinkAnnotation, PSPDFAnnotation, PSPDFNoteAnnotation, PSPDFLoupeView, PSPDFLongPressGestureRecognizer;
 
 /// Handles text selection. PSPDFKit Annotate feature.
 @interface PSPDFTextSelectionView : UIView
@@ -18,6 +18,9 @@
 
 /// Currently selected text.
 @property (nonatomic, copy) NSString *selectedText;
+
+/// Currently selected image.
+@property (nonatomic, strong) PSPDFImageInfo *selectedImage;
 
 /// Currently selected text, optimized for searching
 @property (nonatomic, copy, readonly) NSString *trimmedSelectedText;
@@ -53,7 +56,10 @@
 @property (nonatomic, strong) PSPDFLoupeView *loupeView;
 
 // Returns the menu items for selected text. Can be customized here or in the shouldShowMenu: delegate.
-- (NSArray *)menuItemsForTextSelection;
+- (NSArray *)menuItemsForTextSelection:(NSString *)selectedText;
+
+// Returns the menu items for selected image. Can be customized here or in the shouldShowMenu: delegate.
+- (NSArray *)menuItemsForImageSelection:(PSPDFImageInfo *)imageSelection;
 
 // Debugging feature, visualizes the text blocks.
 - (void)showTextFlowData:(BOOL)show animated:(BOOL)animated;

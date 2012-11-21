@@ -26,6 +26,18 @@
 
 @end
 
+typedef NS_ENUM(NSUInteger, PSPDFSelectionBorderKnobType) {
+    PSPDFSelectionBorderKnobTypeNone,
+    PSPDFSelectionBorderKnobTypeMove,
+    PSPDFSelectionBorderKnobTypeTopLeft,
+    PSPDFSelectionBorderKnobTypeTopMiddle,
+    PSPDFSelectionBorderKnobTypeTopRight,
+    PSPDFSelectionBorderKnobTypeMiddleLeft,
+    PSPDFSelectionBorderKnobTypeMiddleRight,
+    PSPDFSelectionBorderKnobTypeBottomLeft,
+    PSPDFSelectionBorderKnobTypeBottomMiddle,
+    PSPDFSelectionBorderKnobTypeBottomRight
+};
 
 /// Handles view selection with resize knobs.
 @interface PSPDFResizableView : UIView <PSPDFLongPressGestureRecognizerDelegate>
@@ -49,6 +61,9 @@
 
 /// Disables dragging the view outside of the parent. Defaults to YES.
 @property (nonatomic, assign) BOOL preventsPositionOutsideSuperview;
+
+/// Active knob when we're dragging.
+@property (nonatomic, assign) PSPDFSelectionBorderKnobType activeKnobType;
 
 // forward parent gesture recognizer longPress action.
 - (BOOL)longPress:(UILongPressGestureRecognizer *)recognizer;

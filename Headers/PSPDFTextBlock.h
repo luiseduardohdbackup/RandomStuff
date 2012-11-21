@@ -16,12 +16,6 @@
 /// Frame of the text block. Not rotated.
 @property (nonatomic, assign, readonly) CGRect frame;
 
-/// Frame with applied pageTransform rotation. Use this to convert to view coordinate space.
-@property (nonatomic, assign, readonly) CGRect rotatedFrame;
-
-/// Page rotation transform (will be CGAffineTransformIdentity for most documents)
-@property (nonatomic, assign) CGAffineTransform pageRotationTransform;
-
 /// All words of the current text block. Evaluated lazily.
 @property (nonatomic, copy, readonly) NSArray *words;
 

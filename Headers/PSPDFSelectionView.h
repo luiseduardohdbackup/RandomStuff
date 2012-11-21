@@ -37,6 +37,12 @@
 /// Selection View delegate.
 @property (nonatomic, weak) id<PSPDFSelectionViewDelegate> delegate;
 
+/// Color used to span the selection. Defaults to iOS selection blue.
+@property (nonatomic, strong) UIColor *selectionColor;
+
+/// Color used to select words. Defaults to a darker iOS selection blue.
+@property (nonatomic, strong) UIColor *wordSelectionColor;
+
 /// Allows to mark an array of CGRects on the view. rects and rawRects are mutually exclusive and will nil out each other.
 @property (nonatomic, strong) NSArray *rects;
 

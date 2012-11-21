@@ -290,6 +290,17 @@ typedef NS_ENUM(NSInteger, PSPDFPageRenderingMode) {
  */
 @property (nonatomic, assign, getter=isTextSelectionEnabled) BOOL textSelectionEnabled;
 
+/**
+ Allows image selection. Defaults to YES.
+ Will only work if textSelectionEnabled is also set to YES.
+
+ Note: This implies that the image is not in vector format.
+ Will not work on all images (feature is still experimental)
+
+ Only available in PSPDFKit Annotate.
+ */
+@property (nonatomic, assign, getter=isImageSelectionEnabled) BOOL imageSelectionEnabled;
+
 /// If YES, when a PDF that requires a password is set, a password dialog is shown.
 /// (The password dialog is of class PSPDFPasswordView; customize with overrideClassNames)
 /// Defaults to YES. If NO, an attempt to display the document anyway is made.
@@ -557,6 +568,9 @@ extern NSString *const PSPDFPresentOptionPassthroughViews;              // custo
 
 
 @interface PSPDFViewController (SubclassingHooks)
+
+/// Override this initializer to allow all use cases (storyboard loading, etc)
+- (void)commonInitWithDocument:(PSPDFDocument *)document;
 
 /**
  Use this to use specific subclass names instead of the default PSPDF* classes.

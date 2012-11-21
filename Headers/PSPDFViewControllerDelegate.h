@@ -1,4 +1,3 @@
-
 //
 //  PSPDFViewControllerDelegate.h
 //  PSPDFKit
@@ -10,7 +9,7 @@
 #import "PSPDFViewController.h"
 
 @protocol PSPDFAnnotationView;
-@class PSPDFDocument, PSPDFPageInfo, PSPDFPageCoordinates, PSPDFAnnotation, PSPDFPageView, PSPDFScrollView;
+@class PSPDFDocument, PSPDFPageInfo, PSPDFImageInfo, PSPDFPageCoordinates, PSPDFAnnotation, PSPDFPageView, PSPDFScrollView;
 
 /// Implement this delegate on your UIViewController to get notified by PSPDFViewController.
 @protocol PSPDFViewControllerDelegate <NSObject>
@@ -124,6 +123,8 @@
 */
 - (NSArray *)pdfViewController:(PSPDFViewController *)pdfController shouldShowMenuItems:(NSArray *)menuItems atSuggestedTargetRect:(CGRect)rect forSelectedText:(NSString *)selectedText inRect:(CGRect)textRect onPageView:(PSPDFPageView *)pageView;
 
+/// Called before the menu for a selected image is displayed.
+- (NSArray *)pdfViewController:(PSPDFViewController *)pdfController shouldShowMenuItems:(NSArray *)menuItems atSuggestedTargetRect:(CGRect)rect forSelectedImage:(PSPDFImageInfo *)selectedImage inRect:(CGRect)textRect onPageView:(PSPDFPageView *)pageView;
 
 /* Annotations */
 

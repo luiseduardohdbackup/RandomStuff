@@ -72,11 +72,11 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 /// Use this to create custom user annotations. 
 - (id)initWithType:(PSPDFAnnotationType)annotationType;
 
-/// Used for generic PSPDFAnnotations (those that are not recognized by PSPDFAnnotationParser)
+/// Designated initializer. Also used for generic PSPDFAnnotations (those that are not recognized by PSPDFAnnotationParser)
 /// Implement this in your subclass.
 - (id)initWithAnnotationDictionary:(CGPDFDictionaryRef)annotDict inAnnotsArray:(CGPDFArrayRef)annotsArray;
 
-/// Initialize annotation with the corresponding PDF dictionary. Call from subclass.
+/// Initialize annotation with the corresponding PDF dictionary. Call this from subclass.
 - (id)initWithAnnotationDictionary:(CGPDFDictionaryRef)annotationDictionary inAnnotsArray:(CGPDFArrayRef)annotsArray type:(PSPDFAnnotationType)annotationType;
 
 /// Check if point is inside annotation area.
@@ -215,6 +215,7 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 /// If indexOnPage is set, it's a native PDF annotation.
 /// If this is -1, it's not yet saved in the PDF.
 /// Annotations that have indexOnPage >= 0 will be copied before they're modified.
+/// Don't set this property if you're loading annotations from your database.
 @property (nonatomic, assign) int indexOnPage;
 
 /// Some annotations may have a popupIndex. Defaults to -1.
