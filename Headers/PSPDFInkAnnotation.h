@@ -2,13 +2,22 @@
 //  PSPDFInkAnnotation.h
 //  PSPDFKit
 //
-//  Copyright 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFAnnotation.h"
 
 // Helper to convert UIBezierPath into an array of lines (of CGPoints inside NSValues).
 NSArray *PSPDFBezierPathGetPoints(UIBezierPath *path);
+
+// Calculates the bounding box from lines.
+CGRect PSPDFBoundingBoxFromLines(NSArray *lines, CGFloat lineWidth);
+
+// Will convert view lines to PDF lines (operates on every point)
+NSArray *PSPDFConvertViewLinesToPDFLines(NSArray *lines, CGRect cropBox, NSUInteger rotation, CGRect bounds);
+
+// Will convert PDF lines to view lines (operates on every point)
+NSArray *PSPDFConvertPDFLinesToViewLines(NSArray *lines, CGRect cropBox, NSUInteger rotation, CGRect bounds);
 
 /// PDF Ink Annotation. (Free Drawing)
 /// Lines are automatically transformed when the boundingBox is changed.

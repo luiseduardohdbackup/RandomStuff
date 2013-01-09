@@ -12,9 +12,11 @@
 @protocol PSPDFAnnotationView;
 @class PSPDFDocumentProvider, PSPDFFileAnnotationProvider;
 
-// internal events to notify the prividers when annotations are being changed.
-extern NSString *const PSPDFAnnotationChangedNotification; // object = new PSPDFAnnotation.
-extern NSString *const PSPDFAnnotationChangedNotificationKeyPathKey; // NSArray of selector names.
+// Internal events to notify the prividers when annotations are being changed.
+extern NSString *const PSPDFAnnotationChangedNotification;                  // object = new PSPDFAnnotation.
+extern NSString *const PSPDFAnnotationChangedNotificationAnimatedKey;       // set to NO to not animate updates (if it can be animated, that is)
+extern NSString *const PSPDFAnnotationChangedNotificationIgnoreUpdateKey;   // set to YES to disable handling by views.
+extern NSString *const PSPDFAnnotationChangedNotificationKeyPathKey;        // NSArray of selector names.
 extern NSString *const PSPDFAnnotationChangedNotificationOriginalAnnotationKey; // original PSPDFAnnotation.
 
 /**
@@ -23,6 +25,8 @@ extern NSString *const PSPDFAnnotationChangedNotificationOriginalAnnotationKey; 
 
  Usually you want to add your custom PSPDFAnnotationProvider instead of subclassing this.
  If you subclass, use overrideClassNames in PSPDFDocument.
+ 
+ This class will set the documentProvider on both annotation adding and retrieving. You don't have to handle this in your annotationProvider subclass.
 */
 @interface PSPDFAnnotationParser : NSObject <PSPDFAnnotationProviderChangeNotifier>
 

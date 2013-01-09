@@ -10,7 +10,9 @@
 #import "PSPDFTransitionProtocol.h"
 #import "PSPDFViewController.h"
 
-@class PSPDFPageView, PSPDFPagingScrollView;
+@interface PSPDFPagingScrollView : UIScrollView @end
+
+@class PSPDFPageView;
 
 /// Basic magazine-like side scrolling.
 @interface PSPDFPageScrollViewController : PSPDFBaseViewController <PSPDFTransitionProtocol, UIScrollViewDelegate>
@@ -44,5 +46,8 @@
 
 // Rotation Helper.
 @property (nonatomic, assign) NSUInteger targetPageAfterRotation;
+
+// Will configure the PSPDFScrollView and set the properties on it.
+- (void)configureScrollView:(PSPDFScrollView *)page forPageIndex:(NSUInteger)pageIndex;
 
 @end

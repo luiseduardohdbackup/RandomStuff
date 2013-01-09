@@ -7,7 +7,7 @@
 
 #import "PSPDFKitGlobal.h"
 
-@class PSPDFViewController, PSPDFCopiedBarButtonItem;
+@class PSPDFViewController;
 
 /**
  Custom subclass that handles a UIBarButtonItem within the UINavigationBar of PSPDFViewController.
@@ -39,7 +39,7 @@
 // Defaults to (UIBarButtonSystemItem)-1. If you want to e.g. override the searchBarButtonItem that uses a system item, you need to override the PSPDFSearchBarButtonItem class, register it at overrideClassNames, return (UIBarButtonSystemItem)-1 here and implement image/landscapeImagePhone.
 - (UIBarButtonSystemItem)systemItem;
 
-/// Optional. Used if image is set and iOS >= 5.
+/// Optional. Used if image is set.
 - (UIImage *)landscapeImagePhone;
 
 /// Always implement actionName in your subclass.
@@ -72,6 +72,10 @@
 - (void)dismissAnimated:(BOOL)animated;
 - (void)didDismiss;
 
+/// Use if presentModal needs to return nil because of a long-running process.
+/// Use this to correctly set up barButton dismissal logic for non-popopver controls (e.g. UIDocumentInteractionController)
+- (void)setPresentedObject:(id)presentedObject sender:(id)sender;
+
 /// Helper method to present and dismiss a view controller inside a popover controller on iPad or modally on iPhone.
 - (id)presentModalOrInPopover:(UIViewController *)viewController sender:(id)sender;
 - (void)dismissModalOrPopoverAnimated:(BOOL)animated;
@@ -89,16 +93,8 @@
 /// Subclass to react on long press events. Only invoked if isLongPressActionAvailable is set to YES.
 - (void)longPressAction:(PSPDFBarButtonItem *)sender;
 
-/// UIBarButtonItem is immutable; once initialized, images are fixed.
-/// This returns a current state copy and relays the events.
-- (PSPDFCopiedBarButtonItem *)toolbarCopy;
-
-@end
-
-// Because UIBarButtonItem is so inflexible, we need copies for image changes.
-@interface PSPDFCopiedBarButtonItem : UIBarButtonItem
-
-// Link to the original barButton.
-@property (nonatomic, strong, readonly) PSPDFBarButtonItem *originalBarButtonItem;
+// UIActionSheet support.
+@property (nonatomic, strong) UIActionSheet *actionSheet;
+@property (nonatomic, assign, getter=isDismissingSheet) BOOL dismissingSheet;
 
 @end

@@ -15,6 +15,7 @@
 @interface PSPDFScrobbleBar : UIView <PSPDFCacheDelegate>
 
 /// PDF controller delegate. We use KVO, so no weak here.
+/// Re-set pdfController to update the tintColor.
 @property (nonatomic, unsafe_unretained) PSPDFViewController *pdfController;
 
 /// Updates toolbar, realigns page screenshots. Registers in the runloop and works later.
@@ -32,5 +33,11 @@
 /// Access toolbar. It's in an own view, to have a transparent toolbar but non-transparent images.
 /// Alpha is set to 0.7, can be changed.
 @property (nonatomic, strong) UIToolbar *toolbar;
+
+/// Defaults to 5. 
+@property (nonatomic, assign) CGFloat leftBorderMargin;
+
+/// Defaults to 5.
+@property (nonatomic, assign) CGFloat rightBorderMargin;
 
 @end

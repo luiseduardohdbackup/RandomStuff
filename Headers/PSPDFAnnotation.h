@@ -10,6 +10,7 @@
 @class PSPDFDocument, PSPDFDocumentProvider;
 
 // list of editable annotation types.
+extern NSString *const PSPDFAnnotationTypeStringLink;
 extern NSString *const PSPDFAnnotationTypeStringHighlight;
 extern NSString *const PSPDFAnnotationTypeStringUnderline;
 extern NSString *const PSPDFAnnotationTypeStringStrikeout;
@@ -18,13 +19,16 @@ extern NSString *const PSPDFAnnotationTypeStringFreeText;
 extern NSString *const PSPDFAnnotationTypeStringInk;
 extern NSString *const PSPDFAnnotationTypeStringSquare;
 extern NSString *const PSPDFAnnotationTypeStringCircle;
+// Signature is technically an Ink annotation, but this enables an optimized adding mode (toolbar).
+extern NSString *const PSPDFAnnotationTypeStringSignature;
+
 
 // Annotations defined after the PDF standard.
 typedef NS_OPTIONS(NSUInteger, PSPDFAnnotationType) {
     PSPDFAnnotationTypeNone      = 0,
     PSPDFAnnotationTypeLink      = 1 << 1,  // Links and multimedia extensions
     PSPDFAnnotationTypeHighlight = 1 << 2,  // (Highlight, Underline, StrikeOut) - PSPDFHighlightAnnotationView
-    PSPDFAnnotationTypeText      = 1 << 3,
+    PSPDFAnnotationTypeText      = 1 << 3,  // FreeText
     PSPDFAnnotationTypeInk       = 1 << 4,
     PSPDFAnnotationTypeShape     = 1 << 5,  // Square, Circle
     PSPDFAnnotationTypeLine      = 1 << 6,
@@ -72,6 +76,9 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 /// Returns YES if this annotation type is moveable.
 - (BOOL)isMovable;
 
+/// Returns YES if this annotation type is resizable (all but note annotations usually are).
+- (BOOL)isResizable;
+
 /// Use this to create custom user annotations. 
 - (id)initWithType:(PSPDFAnnotationType)annotationType;
 
@@ -79,7 +86,7 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 /// Implement this in your subclass.
 - (id)initWithAnnotationDictionary:(CGPDFDictionaryRef)annotDict inAnnotsArray:(CGPDFArrayRef)annotsArray;
 
-/// Initialize annotation with the corresponding PDF dictionary. Call this from subclass.
+/// Initialize annotation with the corresponding PDF dictionary. Call this from your direct subclass.
 - (id)initWithAnnotationDictionary:(CGPDFDictionaryRef)annotationDictionary inAnnotsArray:(CGPDFArrayRef)annotsArray type:(PSPDFAnnotationType)annotationType;
 
 /// Check if point is inside annotation area.
@@ -134,13 +141,30 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 /// Color with added alpha value.
 @property (nonatomic, strong, readonly) UIColor *colorWithAlpha;
 
-/// Fill color. Only used for certain annotation types. ("IC" key)
-/// (e.g. Square and Circle Annotations)
-/// FillColor might be nil - treat like clearColor in that case.
+/**
+ Fill color. Only used for certain annotation types. ("IC" key, e.g. Shape Annotations)
+ 
+ FillColor might be nil - treat like clearColor in that case.
+ FillColor will *share* the alpha value set in the .alpha property, and will ignore any custom alpha value set here.
+ 
+ Note: Apple Preview.app will not show you transparency in the fillColor. (tested under 10.8.2)
+ */
 @property (nonatomic, strong) UIColor *fillColor;
+
+/// FillColor with added alpha value.
+@property (nonatomic, strong, readonly) UIColor *fillColorWithAlpha;
 
 /// Optional. Various annotation types may contain text.
 @property (nonatomic, copy) NSString *contents;
+
+/// The annotation name, a text string uniquely identifying it among all the annotations on its page.
+/// (Optional; PDF1.4, "NM" key)
+@property (nonatomic, copy) NSString *name;
+
+/// Date where the annotation was last modifed.
+/// Saved into the PDF as the "M" property (Optional, since PDF 1.1)
+/// Will be updated by PSPDFKt as soon as a property is changed.
+@property (nonatomic, strong) NSDate *lastModified;
 
 /// Border Line Width (only used in certain annotations)
 @property (nonatomic, assign) float lineWidth;
@@ -154,7 +178,7 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 /// Annotation may already be deleted locally, but not written back.
 @property (nonatomic, assign, getter=isDeleted) BOOL deleted;
 
-/// Rectangle of specific annotation.
+/// Rectangle of specific annotation. (PDF coordinates)
 @property (nonatomic, assign) CGRect boundingBox;
 
 /// User (title) flag. ("T" property)
@@ -199,7 +223,11 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 // Color string representation (/C [%f %f %f] /CA %f)
 - (NSString *)pdfColorWithAlphaString;
 
+// Border dictionary. e.g. /BS <</Type /Border /W 3 /S /U>>
+- (NSString *)pdfBorderString;
+
 // Appends escaped contents data if contents length is > 0.
+// Will also add user and name if set.
 - (void)appendEscapedContents:(NSMutableData *)pdfData;
 
 // Converts an array of NSValue-CGRect's into an array of CGRect-NSString's.
@@ -213,6 +241,7 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 
 /// Annotations that have indexOnPage >= 0 will be copied before they're modified.
 /// Returns same type as current class.
+/// YOU NEED TO CALL THIS EVERY TIME BEFORE TRYING TO EDIT AN ANNOTATION.
 - (instancetype)copyAndDeleteOriginalIfNeeded;
 
 /// If indexOnPage is set, it's a native PDF annotation.
@@ -232,6 +261,12 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationBorderStyle) {
 - (void)parse;
 
 @end
+
+// Helper for pdfDataRepresentation creation.
+@interface NSMutableData (PSPDFAdditions)
+- (void)pspdf_appendDataString:(NSString *)dataString;
+@end
+
 
 @interface PSPDFAnnotation (Deprecated)
 

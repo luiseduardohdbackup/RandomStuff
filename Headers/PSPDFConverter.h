@@ -33,6 +33,12 @@ extern NSDictionary *PSPDFConvertPDFDictionary(CGPDFDictionaryRef pdfDict);
 /// Converts a CGPDFArray into an NSArray.
 extern NSArray *PSPDFConvertPDFArray(CGPDFArrayRef pdfArray);
 
+/// Converts a string formatted after PDF Reference 7.9.4 to an NSDate.
+extern NSDate *PSPDFDateFromString(NSString *pdfDateString);
+
+/// Converts a NSDate to a PDF string formatted after PDF Reference 7.9.4.
+extern NSString *PSPDFStringFromDate(NSDate *date);
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 typedef NS_ENUM(NSInteger, PSPDFRectAlignment) {
@@ -62,6 +68,9 @@ extern CGRect PSPDFAlignRectangles(CGRect alignee, CGRect aligner, PSPDFRectAlig
 /// Alignment helper that allows offsets.
 extern CGRect PSPDFAlignSizeWithinRectWithOffset(CGSize targetSize, CGRect bounds, CGFloat widthOffset, CGFloat heightOffset, PSPDFRectAlignment alignment);
 
+// Divides a source rectangle into two component rectangles, skipping the given amount of padding in between them.
+void PSPDFRectDivideWithPadding(CGRect rect, CGRect *slicePtr, CGRect *remainderPtr, CGFloat sliceAmount, CGFloat padding, CGRectEdge edge);
+
 /// Normalizes rotation values (returns something between 0 and 359)
 extern NSUInteger PSPDFNormalizeRotation(NSInteger rotation);
 
@@ -90,6 +99,7 @@ extern inline CGRect PSPDFNormalizeRect(CGRect rect);
 extern inline CGRect PSPDFCGRectFromPoints(CGPoint p1, CGPoint p2);
 
 #define PSPDFDegreesToRadians(degrees) (degrees * M_PI / 180)
+#define PSPDFRadiansToDegrees(degrees) (degrees * (180 / M_PI))
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 

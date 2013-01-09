@@ -8,10 +8,14 @@
 #import "PSPDFKitGlobal.h"
 #import "PSPDFRenderQueue.h"
 #import "PSPDFResizableView.h"
+#import "PSPDFHUDView.h"
 #import "PSPDFLongPressGestureRecognizer.h"
+#import "PSPDFSignatureViewController.h"
 
 @protocol PSPDFAnnotationView;
-@class PSPDFPageInfo, PSPDFScrollView, PSPDFDocument, PSPDFViewController, PSPDFTextParser, PSPDFTextSelectionView, PSPDFAnnotation, PSPDFRenderStatusView, PSPDFNoteAnnotation, PSPDFOrderedDictionary, PSPDFNoteAnnotationController;
+@class PSPDFLinkAnnotation, PSPDFPageInfo, PSPDFScrollView, PSPDFDocument, PSPDFViewController, PSPDFTextParser, PSPDFTextSelectionView, PSPDFAnnotation, PSPDFRenderStatusView, PSPDFNoteAnnotation, PSPDFOrderedDictionary, PSPDFNoteAnnotationController;
+
+@interface PSPDFAnnotationContainerView : PSPDFHUDView @end
 
 /// Send this event to hide any selections, menus or other interactive page elements.
 extern NSString *const kPSPDFHidePageHUDElements;
@@ -19,7 +23,7 @@ extern NSString *const kPSPDFHidePageHUDElements;
 /// Compound view for a single pdf page. Will not be re-used for different pages.
 /// You can add your own views on top of the UIView (e.g. custom annotations)
 /// Events from a attached UIScrollView will be relayed to PSPDFPageView's.
-@interface PSPDFPageView : UIView <UIScrollViewDelegate, PSPDFRenderDelegate, PSPDFResizableViewDelegate, PSPDFLongPressGestureRecognizerDelegate>
+@interface PSPDFPageView : UIView <UIScrollViewDelegate, PSPDFRenderDelegate, PSPDFResizableViewDelegate, PSPDFLongPressGestureRecognizerDelegate, PSPDFSignatureViewControllerDelegate>
 
 /// Designated initializer.
 /// Note: We already need pdfController at this stage to check the classOverride table.
@@ -52,6 +56,17 @@ extern NSString *const kPSPDFHidePageHUDElements;
 
 /// UIImageView for the zoomed in state. Readonly.
 @property (nonatomic, strong, readonly) UIImageView *renderView;
+
+/**
+ Container view for all overlay annotations.
+ 
+ This is just a named subclass of UIView that will always track the frame of the PSPDFPageView.
+ It's useful to coordinate this with your own subviews to get the zIndex right.
+ 
+ @warning Most annotations will not be rendered as overlays or only when they are currently being selected.
+ Rendering annotations within the pageView has several advantages including performance or view color multiplication (in case of highlight annotations)
+ */
+@property (nonatomic, strong, readonly) PSPDFAnnotationContainerView *annotationContainerView;
 
 /// Size used for the zoomed-in part. Should always be bigger than the screen.
 /// This is set to a good default already. You shouldn't need to touch this.
@@ -105,6 +120,7 @@ extern NSString *const kPSPDFHidePageHUDElements;
 - (CGRect)convertGlyphRectToViewRect:(CGRect)glyphRect;
 
 /// Convert a view rect to PDF glyph rect.
+/// This is equilvalent to [self convertPDFRectToViewRect:CGRectApplyAffineTransform(glyphRect, pageInfo.pageRotationTransform)]
 - (CGRect)convertViewRectToGlyphRect:(CGRect)viewRect;
 
 /// Get the glyphs/words on a specific page.
@@ -209,12 +225,12 @@ extern NSString *const kPSPDFHidePageHUDElements;
 
  Especially with PSPDFLinkAnnotation, the resulting views are - depending on the subtype - PSPDFVideoAnnotationView, PSPDFWebAnnotationView and much more. The classic PDF link is a PSPDFLinkAnnotationView.
 
- This method is called recursively with all annotation types except if they return isOverlay = NO.
+ This method is called recursively with all annotation types except if they return isOverlay = NO. In case of isOverlay = NO, it will call updateView to re-render the page.
  */
-- (void)loadPageAnnotation:(PSPDFAnnotation *)annotation animated:(BOOL)animated;
+- (void)addAnnotation:(PSPDFAnnotation *)annotation animated:(BOOL)animated;
 
 /// Remove an annotation from the view.
-- (BOOL)removePageAnnotation:(PSPDFAnnotation *)annotation animated:(BOOL)animated;
+- (BOOL)removeAnnotation:(PSPDFAnnotation *)annotation animated:(BOOL)animated;
 
 @end
 
@@ -233,10 +249,14 @@ extern NSString *const kPSPDFHidePageHUDElements;
 - (void)loadPageAnnotationsAnimated:(BOOL)animated;
 
 /// Returns annotations that we could tap on. (checks against editableAnnotationTypes)
+/// The point will have a variance of a few pixels to improve touch recognition.
 - (NSArray *)tappableAnnotationsAtPoint:(CGPoint)viewPoint;
 
 /// Can be used for manual tap forwarding.
 - (BOOL)singleTappedAtViewPoint:(CGPoint)viewPoint;
+
+/// Show menu if annotation/text is selected.
+- (void)showMenuIfSelectedAnimated:(BOOL)animated;
 
 /// Render options that are used for the live-page rendering. (not for the cache)
 /// One way to ues this would be to customize what annotations types will be rendered with the pdf.
@@ -247,12 +267,24 @@ extern NSString *const kPSPDFHidePageHUDElements;
 @property (nonatomic, assign) BOOL suspendUpdate;
 
 /// Remove a page annotation as soon as the page has been refreshed.
-- (BOOL)removePageAnnotationOnNextPageUpdate:(PSPDFAnnotation *)annotation;
+- (BOOL)removeAnnotationOnNextPageUpdate:(PSPDFAnnotation *)annotation;
 
 /// Allow to update the boundingBox correctly for isOverlay = YES annotations.
 - (void)updatePageAnnotationView:(UIView<PSPDFAnnotationView> *)annotationView usingBlock:(void (^)(PSPDFAnnotation *annotation))block;
 
 /// View for the selected annotation.
 @property (nonatomic, strong, readonly) PSPDFResizableView *annotationSelectionView;
+
+/// Will create and show the action sheet on long-press above a PSPDFLinkAnnotation.
+/// Return nil if you don't show the actionSheet, or return the object you're showing. (UIView or UIViewController subclass)
+- (id)showLinkPreviewActionSheetForAnnotation:(PSPDFLinkAnnotation *)annotation fromRect:(CGRect)viewRect animated:(BOOL)animated;
+
+@end
+
+@interface PSPDFPageView (Deprecated)
+
+- (void)loadPageAnnotation:(PSPDFAnnotation *)annotation animated:(BOOL)animated __attribute__ ((deprecated("Use addAnnotation:animated: instead.")));
+
+- (void)removePageAnnotation:(PSPDFAnnotation *)annotation animated:(BOOL)animated __attribute__ ((deprecated("Use removePageAnnotation:animated: instead.")));
 
 @end

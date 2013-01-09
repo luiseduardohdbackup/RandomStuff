@@ -2,15 +2,24 @@
 //  PSPDFGlyph.h
 //  PSPDFKit
 //
-//  Copyright 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
 
 @class PSPDFFontInfo;
 
-// Global helper to convert glyphs to rects.
+/// Global helper to convert glyphs to rects.
+/// 't' is the pageRotationTransform of PSPDFPageInfo.
+/// boundingBox will already be transformed with 't'.
 extern NSArray *PSPDFRectsFromGlyphs(NSArray *glyphs, CGAffineTransform t, CGRect *boundingBox);
+
+/// Returns the boundingBox that includes all glyphs.
+/// 't' is the pageRotationTransform of PSPDFPageInfo.
+extern CGRect PSPDFBoundingBoxFromGlyphs(NSArray *glyphs, CGAffineTransform t);
+
+/// Scans glyphs and reduces the selection to columns.
+extern NSArray *PSPDFReduceGlyphsToColumn(NSArray *glyphs);
 
 /// Represents a single character (glyph) on the pdf page.
 /// Adobe also might reference to this as "Quad".

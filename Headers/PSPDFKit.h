@@ -36,6 +36,7 @@
 #import "PSPDFContentScrollView.h"
 #import "PSPDFPageViewController.h"
 #import "PSPDFSinglePageViewController.h"
+#import "PSPDFPageScrollViewController.h"
 #import "PSPDFTabbedViewController.h"
 #import "PSPDFViewState.h"
 #import "PSPDFPasswordView.h"
@@ -50,6 +51,9 @@
 // search
 #import "PSPDFTextSearch.h"
 #import "PSPDFTextParser.h"
+#import "PSPDFGlyph.h"
+#import "PSPDFWord.h"
+#import "PSPDFTextBlock.h"
 #import "PSPDFSearchViewController.h"
 #import "PSPDFSearchResult.h"
 #import "PSPDFSearchHighlightView.h"
@@ -71,6 +75,7 @@
 #import "PSPDFAnnotationParser.h"
 #import "PSPDFAnnotation.h"
 #import "PSPDFAnnotationProvider.h"
+#import "PSPDFFileAnnotationProvider.h"
 #import "PSPDFHighlightAnnotation.h"
 #import "PSPDFFreeTextAnnotation.h"
 #import "PSPDFNoteAnnotation.h"
@@ -91,6 +96,7 @@
 #import "PSPDFLabelParser.h"
 
 // toolbar (subclass buttons to change image)
+#import "PSPDFIconGenerator.h"
 #import "PSPDFBarButtonItem.h"
 #import "PSPDFCloseBarButtonItem.h"
 #import "PSPDFEmailBarButtonItem.h"
@@ -103,6 +109,7 @@
 #import "PSPDFBookmarkBarButtonItem.h"
 #import "PSPDFBrightnessBarButtonItem.h"
 #import "PSPDFOutlineBarButtonItem.h"
+#import "PSPDFActivityBarButtonItem.h"
 
 // helper
 #import "PSPDFAlertView.h"
@@ -110,3 +117,6 @@
 #import "PSPDFMenuItem.h"
 #import "PSPDFProcessor.h"
 #import "PSPDFProgressHUD.h"
+#import "PSPDFColorButton.h"
+#import "PSPDFColorSelectionViewController.h"
+#import "PSPDFHSVColorPickerController.h"

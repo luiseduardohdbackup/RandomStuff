@@ -2,7 +2,7 @@
 //  PSPDFTextSelectionView.h
 //  PSPDFKit
 //
-//  Copyright 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -34,7 +34,8 @@
 @property (nonatomic, assign, readonly) CGRect selectionRect;
 
 /// Updates the UIMenuController if there is a selection.
-- (void)updateMenuAnimated:(BOOL)animated;
+/// Returns YES if a menu is displayed.
+- (BOOL)updateMenuAnimated:(BOOL)animated;
 
 /// Update the selection (text menu).
 - (void)updateSelection;

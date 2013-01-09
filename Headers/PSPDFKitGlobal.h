@@ -14,6 +14,8 @@
 /// *Completely* disables logging. not advised to change this, use kPSPDFLogLevel instead.
 #define kPSPDFKitDebugEnabled
 
+//#define kPSPDFEnableAllBarButtonItems
+
 extern NSString *const kPSPDFErrorDomain;
 
 typedef NS_ENUM(NSInteger, PSPDFErrorCode) {
@@ -23,6 +25,7 @@ typedef NS_ENUM(NSInteger, PSPDFErrorCode) {
     PSPDFErrorCodeDocumentLocked = 300,
     PSPDFErrorCodeFailedToLoadAnnotations = 400,
     PSPDFErrorCodeFailedToWriteAnnotations = 410,
+    PSPDFErrorCodeFailedToLoadBookmarks = 450,
     PSPDFErrorCodeOutlineParser = 500,
     PSPDFErrorCodeUnableToConvertToDataRepresentation = 600,
     PSPDFErrorCodeRemoveCacheError = 700,
@@ -139,7 +142,7 @@ extern CGFloat psrangef(float minRange, float value, float maxRange);
 extern NSString *PSPDFTrimString(NSString *string);
 
 // Checks if the current controller class is displayed in the popover (also checks UINavigationController)
-extern BOOL PSPDFIsControllerClassInPopover(UIPopoverController *popoverController, Class controllerClass);
+extern BOOL PSPDFIsControllerClassInPopoverAndVisible(UIPopoverController *popoverController, Class controllerClass);
 
 // Convert an NSArray of NSNumber's to an NSIndexSet
 extern NSIndexSet *PSPDFIndexSetFromArray(NSArray *array);
@@ -169,10 +172,10 @@ extern NSURL *PSPDFTempFileURLWithPathExtension(NSString *prefix, NSString *path
 
 // Log helper
 #ifdef kPSPDFKitDebugEnabled
-#define PSPDFLogVerbose(fmt, ...) do { if(kPSPDFLogLevel >= PSPDFLogLevelVerbose) NSLog((@"%s/%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__); }while(0)
-#define PSPDFLog(fmt, ...) do { if(kPSPDFLogLevel >= PSPDFLogLevelInfo) NSLog((@"%s/%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__); }while(0)
-#define PSPDFLogWarning(fmt, ...) do { if(kPSPDFLogLevel >= PSPDFLogLevelWarning) NSLog((@"Warning: %s/%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__); }while(0)
-#define PSPDFLogError(fmt, ...) do { if(kPSPDFLogLevel >= PSPDFLogLevelError) NSLog((@"Error: %s/%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__); }while(0)
+#define PSPDFLogVerbose(fmt, ...) do { if (kPSPDFLogLevel >= PSPDFLogLevelVerbose) NSLog((@"%s/%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__); }while(0)
+#define PSPDFLog(fmt, ...) do { if (kPSPDFLogLevel >= PSPDFLogLevelInfo) NSLog((@"%s/%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__); }while(0)
+#define PSPDFLogWarning(fmt, ...) do { if (kPSPDFLogLevel >= PSPDFLogLevelWarning) NSLog((@"Warning: %s/%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__); }while(0)
+#define PSPDFLogError(fmt, ...) do { if (kPSPDFLogLevel >= PSPDFLogLevelError) NSLog((@"Error: %s/%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__); }while(0)
 #else
 #define PSPDFLogVerbose(...)
 #define PSPDFLog(...)
@@ -213,6 +216,10 @@ if (kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_6_0 || _
 
 @interface NSArray (PSPDFArrayAccess)
 - (id)ps_firstObject;
+@end
+@interface NSMutableArray (PSPDFArrayAccess)
+- (void)ps_addObjectSafe:(id)anObject;
+- (void)ps_addObjectsFromArraySafe:(NSArray *)otherArray;
 @end
 
 // Smart little helper to find main thread hangs. Enable in appDidFinishLaunching.
