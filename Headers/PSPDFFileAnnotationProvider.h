@@ -2,7 +2,7 @@
 //  PSPDFFileAnnotationProvider.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -44,7 +44,7 @@
 /// Will add the annotation to the current annotation array. Will accept any annotations.
 - (BOOL)addAnnotations:(NSArray *)annotations forPage:(NSUInteger)page;
 
-/// Removes all annotation and re-evalutes the document on next access.
+/// Removes all annotation and re-evaluates the document on next access.
 - (void)clearCache;
 
 /// Try to load annotations from file and set them if successful.
@@ -85,8 +85,8 @@
 /// Resolves a PSPDFKit-style URL to the appropriate NSURL.
 + (NSURL *)resolvePath:(NSString *)path forDocument:(PSPDFDocument *)document page:(NSUInteger)page;
 
-/// filtered fileTypeTranslationTable that only returns video elements.
-- (NSArray *)videoFileTypes;
+/// filtered fileTypeTranslationTable that only returns video or audio elements.
+- (NSArray *)mediaFileTypes;
 
 /// Removes all annotations that are marked as deleted.
 - (NSUInteger)removeDeletedAnnotations;

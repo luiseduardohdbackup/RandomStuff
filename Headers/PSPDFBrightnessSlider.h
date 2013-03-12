@@ -2,7 +2,7 @@
 //  PSPDFBrightnessSlider.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //  Based on work of Ryan Sullivan. BSD licensed.
 //
 
@@ -17,7 +17,7 @@ typedef enum {
 typedef enum {
     PSPDFSliderBackgroundStyleDefault = 0,
     PSPDFSliderBackgroundStyleGrayscale,
-    PSPDFSliderBackgroundStyleColorfull,
+    PSPDFSliderBackgroundStyleColorful,
 } PSPDFSliderBackgroundStyle;
 
 @class PSPDFColorPickerView;

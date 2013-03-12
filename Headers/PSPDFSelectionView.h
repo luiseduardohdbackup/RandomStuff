@@ -2,7 +2,7 @@
 //  PSPDFSelectionView.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -24,6 +24,9 @@
 
 /// Called when rect selection was cancelled. (touchesCancelled)
 - (void)selectionView:(PSPDFSelectionView *)selectionView cancelledWithSelectedRect:(CGRect)rect;
+
+/// Called when we did a single tap in the selection view (via tap gesture recognizer
+- (void)selectionView:(PSPDFSelectionView *)selectionView singleTappedWithGestureRecognizer:(UITapGestureRecognizer *)gestureRecognizer;
 
 @end
 

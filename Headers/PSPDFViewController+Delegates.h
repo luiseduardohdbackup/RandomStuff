@@ -2,13 +2,20 @@
 //  PSPDFViewController+Delegates.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFViewController.h"
 
 @protocol PSPDFAnnotationView;
 @class PSPDFPageView, PSPDFAnnotation, PSPDFPageCoordinates, PSPDFPageInfo, PSPDFImageInfo;
+
+// NSNotification equivalent to didLoadPageView: delegate.
+extern NSString *const PSPDFViewControllerDidLoadPageViewNotification;
+
+// NSNotification equivalent to didShowPageView: delegate.
+extern NSString *const PSPDFViewControllerDidShowPageViewNotification;
+
 
 @interface PSPDFViewController (Delegates)
 

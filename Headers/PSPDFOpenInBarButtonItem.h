@@ -2,7 +2,7 @@
 //  PSPDFOpenInBarButtonItem.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFBarButtonItem.h"
@@ -42,7 +42,7 @@ extern BOOL kPSPDFCheckIfCompatibleAppsAreInstalled;
 @interface PSPDFOpenInBarButtonItem (SubclassingHooks)
 
 /// Will figure out a file-based URL that we can attach to the interaction controller.
-/// Default implementation will use PSPDFProcessor to merge multple document files if needed in a temporary directory.
+/// Default implementation will use PSPDFProcessor to merge multiple document files if needed in a temporary directory.
 - (NSURL *)fileURLForDocument:(PSPDFDocument *)document;
 
 // Used to create the document interaction controller during presentAnimated:
@@ -53,5 +53,9 @@ extern BOOL kPSPDFCheckIfCompatibleAppsAreInstalled;
 
 // Shows the open in controller. options at this point can only be exactly one item, not multiple.
 - (void)showOpenInControllerWithOptions:(PSPDFOpenInOptions)options animated:(BOOL)animated sender:(id)sender;
+
+// Presenting OpenIn/Options Menu
+- (BOOL) presentOpenInMenuFromBarButtonItem:(id)sender animated:(BOOL)animated;
+- (BOOL) presentOpenInMenuFromRect:(CGRect)senderRect inView:(id)sender animated:(BOOL)animated;
 
 @end

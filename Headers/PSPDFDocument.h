@@ -2,7 +2,7 @@
 //  PSPDFDocument.h
 //  PSPDFKit
 //
-//  Copyright 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -14,11 +14,19 @@
 
 @class PSPDFTextSearch, PSPDFOutlineParser, PSPDFPageInfo, PSPDFAnnotationParser, PSPDFViewController, PSPDFTextParser, PSPDFDocumentParser, PSPDFDocumentProvider, PSPDFBookmarkParser;
 
+// Annotations can be saved in the PDF or alongside in an external file.
 typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
     PSPDFAnnotationSaveModeDisabled,
-    PSPDFAnnotationSaveModeExternalFile, // will use save/loadAnnotationsWithError of PSPDFAnnotationParser (override to ship your own)
+    PSPDFAnnotationSaveModeExternalFile, // Uses save/loadAnnotationsWithError in PSPDFAnnotationParser.
     PSPDFAnnotationSaveModeEmbedded,
     PSPDFAnnotationSaveModeEmbeddedWithExternalFileAsFallback // Default.
+};
+
+// Creates annotations based on the text content. See detectLinkTypes:forPagesInRange:.
+typedef NS_OPTIONS(NSUInteger, PSPDFTextCheckingType) {
+    PSPDFTextCheckingTypeLink        = 1 << 0,  // URLs
+    PSPDFTextCheckingTypePhoneNumber = 1 << 1,  // Phone numbers
+    PSPDFTextCheckingTypeAll         = UINT_MAX
 };
 
 /**
@@ -26,7 +34,7 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
  Internally it might come from several different sources, files or data.
  
  Ensure that a document is only opened within *one* PSPDFViewController at a time.
- Documents fully support copy or serialiation.
+ Documents fully support copy or serialization.
  
  To speed up PSPDFViewController display, you can invoke fillCache on any thread. Most methods are thread safe. If you change settings here while the document is already being displayed, you most likely need to call reloadData on  PSPDFViewController to refresh.
  
@@ -45,13 +53,14 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 + (instancetype)PDFDocumentWithURL:(NSURL *)URL;
 
 /// Initialize PSPDFDocument with data.
+/// @warning You might want to set a custom UID when initialized with NSData, else the UID will be calculated from the PDF contents, which might be the same for two equal files.
 + (instancetype)PDFDocumentWithData:(NSData *)data;
 
 /// Initialize PSPDFDocument with multiple data objects
 + (instancetype)PDFDocumentWithDataArray:(NSArray *)dataArray;
 
 /// Initialize PSPDFDocument with a dataProvider.
-/// Note: You might need to manually set a UID to enable caching if the dataProvider is too big to be copied into memory.
+/// @warning You might need to manually set a UID to enable caching if the dataProvider is too big to be copied into memory.
 + (instancetype)PDFDocumentWithDataProvider:(CGDataProviderRef)dataProvider;
 
 /// Initialize PSPDFDocument with distinct path and an array of files.
@@ -62,15 +71,15 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// For leading zeros, use the default printf syntax. (%04d = 0001)
 + (instancetype)PDFDocumentWithBaseURL:(NSURL *)baseURL fileTemplate:(NSString *)fileTemplate startPage:(NSInteger)startPage endPage:(NSInteger)endPage;
 
-- (instancetype)init;
-- (instancetype)initWithURL:(NSURL *)URL;
-- (instancetype)initWithData:(NSData *)data;
-- (instancetype)initWithDataArray:(NSArray *)data;
-- (instancetype)initWithDataProvider:(CGDataProviderRef)dataProvider;
-- (instancetype)initWithBaseURL:(NSURL *)basePath files:(NSArray *)files;
-- (instancetype)initWithBaseURL:(NSURL *)basePath fileTemplate:(NSString *)fileTemplate startPage:(NSInteger)startPage endPage:(NSInteger)endPage;
+- (id)init;
+- (id)initWithURL:(NSURL *)URL;
+- (id)initWithData:(NSData *)data;
+- (id)initWithDataArray:(NSArray *)data;
+- (id)initWithDataProvider:(CGDataProviderRef)dataProvider;
+- (id)initWithBaseURL:(NSURL *)basePath files:(NSArray *)files;
+- (id)initWithBaseURL:(NSURL *)basePath fileTemplate:(NSString *)fileTemplate startPage:(NSInteger)startPage endPage:(NSInteger)endPage;
 
-/// Compare to documents.
+/// Compare two documents.
 - (BOOL)isEqualToDocument:(PSPDFDocument *)otherDocument;
 
 /// Delegate. Used for annotation calls.
@@ -92,7 +101,7 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// Returns the URL corresponding to the fileIndex
 - (NSURL *)URLForFileIndex:(NSInteger)fileIndex;
 
-/// Returs a NSURL files array with the base path already added (if there is one)
+/// Returns a NSURL files array with the base path already added (if there is one)
 - (NSArray *)filesWithBasePath;
 
 /**
@@ -161,8 +170,12 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
  Set this to an empty set to disable annotation editing/creation.
  
  Defaults to all available STRING constants (PSPDFAnnotationTypeStringHighlight, PSPDFAnnotationTypeStringInk, etc).
+ 
+ Since PSPDFKit 2.8, this now is an ordered set - the order will change the button order in the toolbar and the page menu.
+ 
+ @warning Some annotation types are only behaviorally different in PSPDFKit but in are mapped to basic annotation types, so adding those will only change the creation of those types, not editing. Example: If you add PSPDFAnnotationTypeStringInk but not PSPDFAnnotationTypeStringSignature, signatures added in previous session will still be editable (since they are Ink annotations). On the other hand, if you set PSPDFAnnotationTypeStringSignature but not PSPDFAnnotationTypeStringInk, then your newly created signatures will not be movable. See PSPDFAnnotation.h for comments 
 */
-@property (nonatomic, copy) NSSet *editableAnnotationTypes;
+@property (nonatomic, copy) NSOrderedSet *editableAnnotationTypes;
 
 /// Can PDF annotations be embedded?
 /// Note: only evaluates the first file if multiple files are set.
@@ -192,6 +205,9 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
  */
 - (BOOL)saveChangedAnnotationsWithError:(NSError **)error;
 
+/// Returns YES if any provider of the document has dirty annotations that need saving.
+- (BOOL)hasDirtyAnnotations;
+
 /// Link annotation parser class for current document.
 /// Can be overridden to use a subclassed annotation parser.
 /// Note: Only returns the parser for the first PDF file.
@@ -210,6 +226,9 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// Shorthand accessor that compensates the page. See PSPDFAnnotationParser for details.
 - (void)addAnnotations:(NSArray *)annotations forPage:(NSUInteger)page;
 
+/// Get all annotations of all documentProviders.
+- (NSDictionary *)allAnnotationsOfType:(PSPDFAnnotationType)annotationType;
+
 /**
  Returns the annotation parser for a specific page.
  page is needed if your PSPDFDocument contains multiple PSPDFDocumentProviders.
@@ -227,7 +246,17 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 
 /// Return pdf page count.
 /// Might need file operations to parse the document (slow)
-- (NSUInteger)pageCount;
+@property (nonatomic, assign, readonly) NSUInteger pageCount;
+
+/**
+ Limit pages to a certain page range.
+
+ If document has a pageRange set, the visible pages can be limited to a certain subset.
+ Defaults to nil.
+
+ @warning This is still an experimental feature and doesn't yet support multiple document sources. Changing this will require a reloadData on the PSPDFViewController and also a clearCache for this document (as the cached pages will be different after changing this!)
+ */
+@property (nonatomic, copy) NSIndexSet *pageRange;
 
 /// Return PDF page number (PDF pages start at 1).
 /// This may be different if a collection of pdfs is used a one big document. Page starts at 0.
@@ -269,7 +298,7 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /**
  Will clear all cached objects (annotations, pageCount, ouline, textParser, ...)
 
- This is called implicitely if you change the files array or append a file.
+ This is called implicitly if you change the files array or append a file.
  
  Important! Unless you disable it, PSPDFKit also has an image cache who is not affected by this. If you replace the PDF document with new content, you also need to clear the image cache:
  [[PSPDFCache sharedCache] removeCacheForDocument:document deleteDocument:NO error:NULL];
@@ -340,7 +369,7 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// Note: only evaluates the first file if multiple files are set.
 @property (nonatomic, assign, readonly) BOOL allowsPrinting;
 
-/// Was the PDF file encryted at file creation time?
+/// Was the PDF file encrypted at file creation time?
 /// Note: only evaluates the first file if multiple files are set.
 @property (nonatomic, assign, readonly) BOOL isEncrypted;
 
@@ -383,7 +412,7 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 /// Can be used to calculate from the document provider page to the PSPDFDocument page.
 - (NSUInteger)pageOffsetForDocumentProvider:(PSPDFDocumentProvider *)documentProvider;
 
-/// Get an array of documentProviers to easily manage documents with multiple files.
+/// Get an array of documentProviders to easily manage documents with multiple files.
 @property (nonatomic, copy, readonly) NSArray *documentProviders;
 
 /// Document Parser is per file, so might return the same parser for different pages.
@@ -391,12 +420,13 @@ typedef NS_ENUM(NSInteger, PSPDFAnnotationSaveMode) {
 - (PSPDFDocumentParser *)documentParserForPage:(NSUInteger)page;
 
 /// Outline extraction class for current document.
-/// Note: Only returns the parser for the first PDF file.
+///
+/// @warning Only returns the parser for the first PDF file.
 @property (nonatomic, strong, readonly) PSPDFOutlineParser *outlineParser;
 
-/// Manages the bookmark parser.
-/// Lazily initialized, thread safe.
-/// Can be customized with using overrideClassNames.
+/// Accesses the bookmark parser.
+///
+/// Bookmarks are handled on document level, not on documentProvider.
 @property (nonatomic, strong) PSPDFBookmarkParser *bookmarkParser;
 
 /// Page labels (NSString) for the current document.
@@ -440,8 +470,8 @@ extern NSString *const kPSPDFObjectsAnnotationPageBounds;  // Special case; used
 extern NSString *const kPSPDFObjectsImages;                // Include Image info.
 extern NSString *const kPSPDFObjectsSmartSort;             // Will sort words/annotations (smaller words/annots first). Use for touch detection.
 extern NSString *const kPSPDFObjectsTextFlow;              // Will look at the text flow and select full sentences, not just what's within the rect.
-extern NSString *const kPSPDFObjectsFindFirstOnly;         // Will stop after finding the first maching object.
-extern NSString *const kPSPDFObjectsTestIntersection;      // Only relevant for rect. Will test for interesection instead of objects that are fully included in the pdfRect.
+extern NSString *const kPSPDFObjectsFindFirstOnly;         // Will stop after finding the first matching object.
+extern NSString *const kPSPDFObjectsTestIntersection;      // Only relevant for rect. Will test for intersection instead of objects that are fully included in the pdfRect.
 
 // Output categories
 extern NSString *const kPSPDFGlyphs;
@@ -453,6 +483,7 @@ extern NSString *const kPSPDFImages;
 
 /// Find objects at the current PDF point.
 /// If options is nil, we assume kPSPDFObjectsText and kPSPDFObjectsFullWords.
+/// Unless set otherwise, for points kPSPDFObjectsTestIntersection is YES automatically.
 /// Returns objects in certain key dictionaries (kPSPDFGlyphs, etc)
 - (NSDictionary *)objectsAtPDFPoint:(CGPoint)pdfPoint page:(NSUInteger)page options:(NSDictionary *)options;
 
@@ -513,6 +544,12 @@ extern NSString *const kPSPDFImages;
 
 /// Helper for higher performance.
 - (PSPDFPageInfo *)pageInfoForPage:(NSUInteger)page pageRef:(CGPDFPageRef)pageRef;
+
+/// Experimental. Will iterate all pages and create new annotations for the set types.
+/// Will ignore any text that is already linked with the same URL.
+/// To analyze the whole document, use [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, document.pageCount)]
+/// @warning Performs text and annotation extraction and analysis. Might be slow. Call this before showing the document in the PSPDFViewController or manually add the link annotations.
+- (NSArray *)detectLinkTypes:(PSPDFTextCheckingType)textLinkType forPagesInRange:(NSIndexSet *)pageRange;
 
 @end
 

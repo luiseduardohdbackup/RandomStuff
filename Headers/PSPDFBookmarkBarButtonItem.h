@@ -2,7 +2,7 @@
 //  PSPDFBookmarkBarButtonItem.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFBarButtonItem.h"
@@ -12,7 +12,7 @@
 /// Defaults to YES. Will be ignored if tapChangesBookmarkStatus is NO.
 @property (nonatomic, assign) BOOL showBookmarkControllerOnLongPress;
 
-/// Defauls to YES. NO will show the PSPDFBookmarkViewController instantly.
+/// Defaults to YES. NO will show the PSPDFBookmarkViewController instantly.
 @property (nonatomic, assign) BOOL tapChangesBookmarkStatus;
 
 @end

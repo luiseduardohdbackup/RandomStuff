@@ -2,7 +2,7 @@
 //  PSPDFTextParser.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -17,8 +17,11 @@
 /// Page is absolute to PSPDFDocument
 - (id)initWithPDFPage:(CGPDFPageRef)pageRef page:(NSUInteger)page document:(PSPDFDocument *)document fontCache:(NSMutableDictionary *)fontCache hideGlyphsOutsidePageRect:(BOOL)hideGlyphsOutsidePageRect PDFBox:(CGPDFBox)PDFBox;
 
+/// Directly parse a specific stream.
+- (id)initWithStream:(CGPDFStreamRef)stream;
+
 /// Complete page text.
-@property (nonatomic, copy) NSString *text;
+@property (nonatomic, strong) NSString *text;
 
 /// Uses glyphs to return the corresponding page text, including newlines and spaces.
 - (NSString *)textWithGlyphs:(NSArray *)glyphs;
@@ -33,7 +36,7 @@
 @property (nonatomic, strong, readonly) NSArray *images;
 
 /// List of detected text blocks (PSPDFTextBlock)
-@property (nonatomic, copy, readonly) NSArray *textBlocks;
+@property (nonatomic, strong, readonly) NSArray *textBlocks;
 
 /// Associated document.
 @property (atomic, weak) PSPDFDocument *document;

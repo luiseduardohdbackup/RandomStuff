@@ -2,7 +2,7 @@
 //  PSPDFGraphicsState.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -12,6 +12,7 @@
 @interface PSPDFGraphicsState : NSObject <NSCopying> {
     // tuned for speed, thus no properties
     @public
+    PSPDFFontInfo *font;
     CGAffineTransform textMatrix;
     CGAffineTransform lineMatrix;
     CGAffineTransform ctm;

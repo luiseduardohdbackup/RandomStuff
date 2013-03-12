@@ -2,7 +2,7 @@
 //  PSPDFTabBarButton.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -26,7 +26,7 @@
 /// Minimum tab width. Defaults to 0.
 @property (nonatomic, assign) CGFloat minTabWidth;
 
-/// Maximm tab width. Defaults to 300.
+/// Maximum tab width. Defaults to 300.
 @property (nonatomic, assign) CGFloat maxTabWidth;
 
 @end

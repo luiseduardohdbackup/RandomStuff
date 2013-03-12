@@ -2,13 +2,22 @@
 //  PSPDFViewState.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
+#import "PSPDFModel.h"
 
+// Similar to CGPointZero, but this shows that the point is not initialized, while (0,0) is valid.
+extern const CGPoint PSPDFNilPoint;
+
+///
 /// Represents a certain view state (document position, zoom) of a PSPDFDocument.
-@interface PSPDFViewState : NSObject <NSCoding, NSCopying>
+///
+@interface PSPDFViewState : PSPDFModel
+
+/// Designated initializer.
+- (id)initWithPage:(NSUInteger)page;
 
 /// Zoom scale.
 @property (nonatomic, assign) CGFloat zoomScale;

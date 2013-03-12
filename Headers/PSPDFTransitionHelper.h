@@ -1,8 +1,8 @@
 //
-//  PSPDFTransitionViewController.h
+//  PSPDFTransitionHelper.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -12,7 +12,7 @@
 
 @class PSPDFTransitionHelper, PSPDFViewController, PSPDFContentScrollView, PSPDFSinglePageViewController;
 
-// Helper to communiate with the transition viewController.
+// Helper to communicate with the transition viewController.
 @protocol PSPDFTransitionHelperDelegate <NSObject>
 
 - (PSPDFViewController *)pdfController;

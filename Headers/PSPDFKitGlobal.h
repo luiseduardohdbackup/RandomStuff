@@ -2,7 +2,7 @@
 //  PSPDFKitGlobal.h
 //  PSPDFKit
 //
-//  Copyright 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -14,6 +14,7 @@
 /// *Completely* disables logging. not advised to change this, use kPSPDFLogLevel instead.
 #define kPSPDFKitDebugEnabled
 
+// Debug feature
 //#define kPSPDFEnableAllBarButtonItems
 
 extern NSString *const kPSPDFErrorDomain;
@@ -30,11 +31,13 @@ typedef NS_ENUM(NSInteger, PSPDFErrorCode) {
     PSPDFErrorCodeUnableToConvertToDataRepresentation = 600,
     PSPDFErrorCodeRemoveCacheError = 700,
     PSPDFErrorCodeFailedToConvertToPDF = 800,
+    PSPDFErrorCodeFailedToGeneratePDFInvalidArguments = 810,
+    PSPDFErrorCodeFailedToGeneratePDFDocumentInvalid = 820,
     PSPDFErrorCodeUnknown = 900,
 };
 
-/// Log level defines.
-/// Note that PSPDFLogLevelVerbose will severly slow down the whole application.
+/// Global PSPDFKit log level.
+/// Note that PSPDFLogLevelVerbose will severely slow down the whole application.
 /// (e.g. Some lazy evaluated properties will be evaluated on the main thread)
 typedef NS_ENUM(NSInteger, PSPDFLogLevel) {
     PSPDFLogLevelNothing = 0,
@@ -78,6 +81,9 @@ extern NSString *kPSPDFCacheClassName;
 /// Class name for PSPDFIconGenerator singleton. Change this at the very beginning of your app to support a custom subclass.
 extern NSString *kPSPDFIconGeneratorClassName;
 
+// Returns the (localized) name of the current app.
+extern NSString *PSPDFAppName(void);
+
 /// Get current PSPDFKit version.
 extern NSString *PSPDFVersionString(void);
 
@@ -85,12 +91,17 @@ extern NSString *PSPDFVersionString(void);
 extern NSBundle *PSPDFKitBundle(void);
 
 /// Localizes strings.
+/// Will first look up the string in the PSPDFKit.bundle
 extern NSString *PSPDFLocalize(NSString *stringToken);
 
-// Allows to set a custom dictionary that contains dictionaries with language locales.
-// Will override localization found in the bundle, if a value is found.
-// Falls back to "en" if localization key is not found in dictionary.
+/// Allows to set a custom dictionary that contains dictionaries with language locales.
+/// Will override localization found in the bundle, if a value is found.
+/// Falls back to "en" if localization key is not found in dictionary.
 extern void PSPDFSetLocalizationDictionary(NSDictionary *localizationDict);
+
+/// Register a custom block that handles translation.
+/// If this block returns nil, the PSPDFKit.bundle + localizationDict will be used.
+extern void PSPDFSetLocalizationBlock(NSString* (^localizationBlock)(NSString *stringToLocalize));
 
 /// Resolves paths like "Documents" or "Bundle" to their real path.
 /// If no name is found, the bundle string is always attached, unless fallbackPath is set.
@@ -125,8 +136,13 @@ extern CGFloat PSPDFSimulatorAnimationDragCoefficient(void);
 // Creates a default, 0.25sec long fade transition
 extern CATransition *PSPDFFadeTransition(void);
 
-// Creates a fade transition with 'duration' timimg.
+// Creates a fade transition with 'duration' timing.
 extern CATransition *PSPDFFadeTransitionWithDuration(CGFloat duration);
+
+// UIKit sometimes gets the toolbar position wrong, when we show/hide things at the "wrong" time.
+// While I see this as a bug and have placed some rdars on it, here's a simple workaround.
+// @warning 'animated' is currently ignored.
+extern void PSPDFFixNavigationBarForNavigationControllerAnimated(UINavigationController *navController, BOOL animated);
 
 // Matches actionSheet style via barStyle.
 extern UIActionSheetStyle PSPDPFActionSheetStyleForBarButtonStyle(UIBarStyle barStyle, BOOL translucent);
@@ -163,12 +179,21 @@ extern void PSPDFUnlockRotation(void);
 // Returns a unique temporary file URL.
 extern NSURL *PSPDFTempFileURLWithPathExtension(NSString *prefix, NSString *pathExtension);
 
+// Returns whether both objects are identical or equal via -isEqual.
+BOOL PSPDFEqualObjects(id obj1, id obj2);
+
 #define PSIsIpad() ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
 #define ps_swapf(a,b) { float c = (a); (a) = (b); (b) = c; }
 #define BOXED(val) ({ typeof(val) _tmp_val = (val); [NSValue valueWithBytes:&(_tmp_val) objCType:@encode(typeof(val))]; })
 
+// Compiler-checked selectors
 #define PSPDF_KEYPATH(object, property) ((void)(NO && ((void)object.property, NO)), @#property)
 #define PSPDF_KEYPATH_SELF(property) PSPDF_KEYPATH(self, property)
+#if DEBUG
+#define PROPERTY(propName) NSStringFromSelector(@selector(propName))
+#else
+#define PROPERTY(propName) @#propName
+#endif
 
 // Log helper
 #ifdef kPSPDFKitDebugEnabled
@@ -207,17 +232,17 @@ if (kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_6_0 || _
 #define PSPDF_IF_NOT_SIMULATOR(...) { __VA_ARGS__ }
 #endif
 
-// Starting with iOS6, dispatch queue's are objects and managed via ARC.
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+// Starting with iOS6, dispatch queue's can be objects and managed via ARC.
+#if OS_OBJECT_USE_OBJC
 #define PSPDFDispatchRelease(queue)
 #else
 #define PSPDFDispatchRelease(queue) dispatch_release(queue)
 #endif
 
-@interface NSArray (PSPDFArrayAccess)
+@interface NSArray (PSPDFCollections)
 - (id)ps_firstObject;
 @end
-@interface NSMutableArray (PSPDFArrayAccess)
+@interface NSMutableArray (PSPDFCollections)
 - (void)ps_addObjectSafe:(id)anObject;
 - (void)ps_addObjectsFromArraySafe:(NSArray *)otherArray;
 @end
@@ -229,5 +254,5 @@ if (kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_6_0 || _
 @end
 
 // Force a category to be loaded when an app starts up, see http://developer.apple.com/library/mac/#qa/qa2006/qa1490.html
-#define PSPDF_FIX_CATEGORY_BUG(name) @interface PSPDF_FIX_CATEGORY_BUG_##name @end \
+#define PSPDF_FIX_CATEGORY_BUG(name) @interface PSPDF_FIX_CATEGORY_BUG_##name : NSObject @end \
 @implementation PSPDF_FIX_CATEGORY_BUG_##name @end

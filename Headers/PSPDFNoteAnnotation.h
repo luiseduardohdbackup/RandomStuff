@@ -2,7 +2,7 @@
 //  PSPDFNoteAnnotation.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFAnnotation.h"
@@ -20,7 +20,7 @@ extern CGSize kPSPDFNoteAnnotationViewFixedSize;
 /// Designated initializer.
 - (id)init;
 
-/// Custom HitTest because we have custom widht/height here.
+/// Custom HitTest because we have custom width/height here.
 - (BOOL)hitTest:(CGPoint)point withViewBounds:(CGRect)bounds;
 - (CGRect)boundingBoxForPageViewBounds:(CGRect)pageBounds;
 

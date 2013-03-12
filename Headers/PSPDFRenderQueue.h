@@ -2,7 +2,7 @@
 //  PSPDFRenderQueue.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -10,11 +10,11 @@
 @class PSPDFDocument, PSPDFRenderJob, PSPDFRenderQueue;
 
 // Extension to options; set this to make PSPDFRenderQueue to auto-fetch the annotations
-// of the type that'ss specified in this option.
+// of the type that's specified in this option.
 // Will be ignored if annotations is not nil.
 extern NSString *kPSPDFAnnotationAutoFetchTypes;
 
-/// Implement this delegate to get rendered pages. (Most of the times, you waht to use PSPDFCache instead)
+/// Implement this delegate to get rendered pages. (Most of the times, you want to use PSPDFCache instead)
 @protocol PSPDFRenderDelegate <NSObject>
 
 /// Called when a render job finished. Guaranteed to be called from the main thread.
@@ -26,7 +26,7 @@ extern NSString *kPSPDFAnnotationAutoFetchTypes;
 @interface PSPDFRenderQueue : NSObject
 
 /// Render Queue is a singleton.
-+ (PSPDFRenderQueue *)sharedRenderQueue;
++ (instancetype)sharedRenderQueue;
 
 /// Requests a (freshly) rendered image from a specified document. Does not use the file cache.
 /// For options, see PSPDFPageRender.

@@ -2,7 +2,7 @@
 //  PSPDFDocumentProvider.h
 //  PSPDFKit
 //
-//  Copyright (c) 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -32,10 +32,10 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 /// Initialize with a local file URL.
 - (id)initWithFileURL:(NSURL *)fileURL document:(PSPDFDocument *)document;
 
-/// Initalize with NSData. (can be memory or mapped data)
+/// Initialize with NSData. (can be memory or mapped data)
 - (id)initWithData:(NSData *)data document:(PSPDFDocument *)document;
 
-/// Initalize with CGDataProviderRef. (can be used for dynamic decryption)
+/// Initialize with CGDataProviderRef. (can be used for dynamic decryption)
 - (id)initWithDataProvider:(CGDataProviderRef)dataProvider document:(PSPDFDocument *)document;
 
 /// Referenced NSURL. If this is set, data is nil.
@@ -50,6 +50,9 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 
 /// Returns a NSData representation, memory-maps files, tries to copy a CGDataProviderRef
 - (NSData *)dataRepresentationWithError:(NSError **)error;
+
+/// Returns the fileSize of this documentProvider.
+- (unsigned long long)fileSize;
 
 /// Weak-linked parent document.
 @property (nonatomic, weak, readonly) PSPDFDocument *document;
@@ -89,8 +92,28 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 /// Cached rotation and aspect ratio data for specific page. Page starts at 0.
 - (PSPDFPageInfo *)pageInfoForPage:(NSUInteger)page;
 
-/// Number of pages in the PDF. Nil if source is invalid.
+/// Number of pages in the PDF. Nil if source is invalid. Will be filtered by pageRange.
 @property (nonatomic, assign, readonly) NSUInteger pageCount;
+@property (nonatomic, assign, readonly) NSUInteger pageCountUnfiltered; // ignores pageRange
+@property (nonatomic, assign, readonly) NSUInteger firstPageIndex;      // first page, 0 if pageRange is not set.
+
+/**
+ Limit pages to a certain page range.
+
+ If document has a pageRange set, the visible pages can be limited to a certain subset.
+ Defaults to nil.
+
+ @warning Changing this will require a reloadData on the PSPDFViewController.
+ */
+@property (nonatomic, copy) NSIndexSet *pageRange;
+
+/// Translates the capped page to the real page.
+/// Will only return something different if pageRange is set.
+- (NSUInteger)translateCappedPageToRealPage:(NSUInteger)page;
+
+/// Translates the real page to the capped page.
+/// Will only return something different if pageRange is set.
+- (NSUInteger)translateRealPageToCappedPage:(NSUInteger)page;
 
 /// Unlock the PDF with a password. Returns YES on success. (File operation, might block for a bit
 /// Will set .password to this password if successful.
@@ -105,7 +128,7 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 /// A flag that indicates whether copying text is allowed
 @property (nonatomic, assign) BOOL allowsCopying;
 
-/// Was the PDF file encryted at file creation time?
+/// Was the PDF file encrypted at file creation time?
 @property (nonatomic, assign, readonly) BOOL isEncrypted;
 
 /// Name of the encryption filter used, e.g. Adobe.APS. If this is set, the document can't be unlocked.
@@ -127,7 +150,7 @@ extern NSString *PSPDFKCloseCachedDocumentRefNotification;
 /// Return YES if metadata is already parsed.
 @property (nonatomic, assign, readonly, getter=isMetadataLoaded) BOOL metadataLoaded;
 
-/// Access the PDF title. (".pdf" will be trunicated)
+/// Access the PDF title. (".pdf" will be truncated)
 /// Note: if there's no title in the PDF metadata, the file name will be used.
 @property (nonatomic, copy, readonly) NSString *title;
 

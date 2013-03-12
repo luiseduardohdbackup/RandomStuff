@@ -2,7 +2,7 @@
 //  PSPDFGlobalLock.h
 //  PSPDFKit
 //
-//  Copyright 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -13,7 +13,7 @@
 @interface PSPDFGlobalLock : NSObject
 
 /// Get global singleton.
-+ (PSPDFGlobalLock *)sharedGlobalLock;
++ (instancetype)sharedGlobalLock;
 
 /// TRY to lock with document and logical page number (starts at 0).
 /// returns nil if currently locked.

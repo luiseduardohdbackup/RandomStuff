@@ -2,7 +2,7 @@
 //  PSPDFBookmarkViewController.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFBaseViewController.h"
@@ -33,7 +33,7 @@
 @property (nonatomic, strong) PSPDFDocument *document;
 
 /// Delegate.
-@property (nonatomic, weak) id<PSPDFBookmarkViewControllerDelegate> delegate;
+@property (nonatomic, weak) IBOutlet id<PSPDFBookmarkViewControllerDelegate> delegate;
 
 // PSPDFStyleable attribute.
 @property (nonatomic, assign) BOOL isInPopover;

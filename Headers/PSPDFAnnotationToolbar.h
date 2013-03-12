@@ -2,7 +2,7 @@
 //  PSPDFAnnotationToolbar.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -19,18 +19,22 @@ typedef NS_ENUM(NSUInteger, PSPDFAnnotationToolbarMode) {
     PSPDFAnnotationToolbarUnderline,
     PSPDFAnnotationToolbarFreeText,
     PSPDFAnnotationToolbarDraw,
-    PSPDFAnnotationToolbarSignature
+    PSPDFAnnotationToolbarSignature,
+    PSPDFAnnotationToolbarStamp,
+    PSPDFAnnotationToolbarImage,
 };
 
+///
 /// Delegate to be notified on toolbar actions/hiding.
+///
 @protocol PSPDFAnnotationToolbarDelegate <NSObject>
 
 @optional
 
-// Called when the Done button has been pressed to hide the toolbar.
+/// Called when the Done button has been pressed to hide the toolbar.
 - (void)annotationToolbarDidHide:(PSPDFAnnotationToolbar *)annotationToolbar;
 
-// Called after a mode change is set (button pressed; drawing finished, etc)
+/// Called after a mode change is set (button pressed; drawing finished, etc)
 - (void)annotationToolbar:(PSPDFAnnotationToolbar *)annotationToolbar didChangeMode:(PSPDFAnnotationToolbarMode)newMode;
 
 @end
@@ -62,8 +66,8 @@ extern NSString *const kPSPDFLastUsedColorForAnnotationType; // Dictionary NSStr
 /// Flash toolbar (e.g. if user tries to hide the HUD)
 - (void)flashToolbar;
 
-/// Annotation toolbar delegate.
-@property (nonatomic, strong) id<PSPDFAnnotationToolbarDelegate> delegate;
+/// Annotation toolbar delegate. (Can be freely set to any receiver.)
+@property (nonatomic, weak) IBOutlet id<PSPDFAnnotationToolbarDelegate> delegate;
 
 /// Attached pdfController.
 /// If you update tintColor, barStyle, etc - this needs to be set again to re-capture changed states.
@@ -83,18 +87,30 @@ extern NSString *const kPSPDFLastUsedColorForAnnotationType; // Dictionary NSStr
 /// Enable to auto-hide toolbar after drawing finishes. Defaults to NO.
 @property (nonatomic, assign) BOOL hideAfterDrawingDidFinish;
 
+/// This will issue a save event after the toolbar has been dismissed.
+/// Since saving is slow, this defaults to NO.
+@property (nonatomic, assign) BOOL saveAfterToolbarHiding;
+
+/// Allows to scroll with two fingers while annotation mode is active. Defaults to YES.
+/// Not all annotation modes block scrolling (but highlight, drawing, etc. do).
+/// @warning Do not change this while we are in annotation mode.
+@property (nonatomic, assign) BOOL allowTwoFingerScrollPanDuringLock;
+
 @end
 
 @interface PSPDFAnnotationToolbar (PSPDFSubclassing)
 
-/// Toolbar might be used "headless" but for state management. Manually call buttons here.
+// Toolbar might be used "headless" but for state management. Manually call buttons here.
 - (void)noteButtonPressed:(id)sender;
 - (void)highlightButtonPressed:(id)sender;
 - (void)strikeOutButtonPressed:(id)sender;
 - (void)underlineButtonPressed:(id)sender;
+// Draw replaces the toolbar items with custom items and later restores the original items via using the 'originalItems' property.
 - (void)drawButtonPressed:(id)sender;
 - (void)freeTextButtonPressed:(id)sender;
 - (void)signatureButtonPressed:(id)sender;
+- (void)stampButtonPressed:(id)sender;
+- (void)imageButtonPressed:(id)sender;
 - (void)doneButtonPressed:(id)sender;
 
 // Only allowed during toolbarMode == PSPDFAnnotationToolbarDraw.
@@ -104,13 +120,30 @@ extern NSString *const kPSPDFLastUsedColorForAnnotationType; // Dictionary NSStr
 - (void)undoDrawing:(id)sender;
 - (void)redoDrawing:(id)sender;
 
+// Called anytime the drawing toolbar is updated.
+- (void)updateDrawingToolbar;
+@property (nonatomic, strong, readonly) UIBarButtonItem *undoItem;
+@property (nonatomic, strong, readonly) UIBarButtonItem *redoItem;
+
+// Drawing mode will update the toolbar items, here are the original items saved.
+@property (nonatomic, copy, readonly) NSArray *originalItems;
+
+// Color management.
+- (void)setLastUsedColor:(UIColor *)lastUsedDrawColor forAnnotationType:(NSString *)annotationType;
+- (UIColor *)lastUsedColorForAnnotationTypeString:(NSString *)annotationType;
+
 // Finish up drawing. Usually called by the drawing delegate.
 - (void)finishDrawingAnimated:(BOOL)animated andSaveAnnotation:(BOOL)saveAnnotation;
 
-// helpers to lock/unlock the controller
-- (void)lockPDFController;
+// Helpers to lock/unlock the controller
+- (void)lockPDFControllerAnimated:(BOOL)animated;
 
-// stayOnTop is a runtime tweak to make sure the toolbar stays above the pfController navigationBar.
-- (void)unlockPDFControllerAndEnsureToStayOnTop:(BOOL)stayOnTop;
+// stayOnTop is a runtime tweak to make sure the toolbar stays above the pdfController navigationBar.
+- (void)unlockPDFControllerAnimated:(BOOL)animated showControls:(BOOL)showControls ensureToStayOnTop:(BOOL)stayOnTop;
+
+// Parses the editableAnnotationTypes set from the document.
+// Per default this is the contents of the editableAnnotationTypes set in PSPDFDocument.
+// If set to nil, this will load from pdfController.document.editableAnnotationTypes.allObjects.
+@property (nonatomic, copy) NSOrderedSet *editableAnnotationTypes;
 
 @end

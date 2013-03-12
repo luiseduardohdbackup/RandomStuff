@@ -2,7 +2,7 @@
 //  PSPDFFreeTextAnnotation.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFAnnotation.h"
@@ -22,5 +22,14 @@
 
 /// Font size as defined in the DA appearance string.
 @property (nonatomic, assign) CGFloat fontSize;
+
+/// Return a default font size if not defined in the annotation.
+- (CGFloat)defaultFontSize;
+
+/// Return a default font name (Helvetica) if not defined in the annotation.
+- (NSString *)defaultFontName;
+
+/// Returns the currently set font (calculated from defaultFontSize)
+- (UIFont *)defaultFont;
 
 @end

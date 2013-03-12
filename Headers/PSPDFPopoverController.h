@@ -2,20 +2,20 @@
 //  PSPDFPopoverController.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
 /// UIPopoverController compatible replacement for the iPhone.
-/// This will work well for simple cases, but itn't as advanced as UIPopoverController.
+/// This will work well for simple cases, but isn't as advanced as UIPopoverController.
 @interface PSPDFPopoverController : UIViewController <UINavigationControllerDelegate>
 
 /// The view controller provided becomes the content view controller for the UIPopoverController. This is the designated initializer for PSPDFPopoverController.
 - (id)initWithContentViewController:(UIViewController *)viewController;
 
 /// Delegate for popover dismissal.
-@property (nonatomic, weak) id<UIPopoverControllerDelegate> delegate;
+@property (nonatomic, weak) IBOutlet id<UIPopoverControllerDelegate> delegate;
 
 /// The content view controller is the `UIViewController` instance in charge of the content view of the displayed popover. This property can be changed while the popover is displayed to allow different view controllers in the same popover session.
 @property (nonatomic, strong) UIViewController *contentViewController;
@@ -54,5 +54,8 @@
 
 // NOP.
 @property (nonatomic, readwrite, strong) Class popoverBackgroundViewClass;
+
+/// Action that is invoked before the popover hides. (programmatically or via user action)
+@property (nonatomic, copy) dispatch_block_t popoverWillDismissAction;
 
 @end

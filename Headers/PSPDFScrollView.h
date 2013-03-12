@@ -2,17 +2,18 @@
 //  PSPDFScrollView.h
 //  PSPDFKit
 //
-//  Copyright 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
 #import "PSPDFLongPressGestureRecognizer.h"
+#import "PSPDFKeyboardAvoidingScrollView.h"
 
 @protocol PSPDFAnnotationView;
 @class PSPDFDocument, PSPDFPageView, PSPDFViewController, PSPDFLoupeView;
 
 typedef NS_ENUM(NSInteger, PSPDFShadowStyle) {
-    PSPDFShadowStyleFlat,   // flat  shadow style (Default)
+    PSPDFShadowStyleFlat,   // flat shadow style (Default)
     PSPDFShadowStyleCurl,   // curled shadow style
 };
 
@@ -23,14 +24,14 @@ typedef NS_ENUM(NSInteger, PSPDFShadowStyle) {
  or there is one global PSPDFScrollView for all PSPDFPageView's.
  This is also the center for all the gesture recognizers. Subclass to customize behavior (e.g. override gestureRecognizerShouldBegin)
  
- If you manually zoom/change the contentOffset, you must use the methods with animation extension.
+ @warning If you manually zoom/change the contentOffset, you must use the methods with animation extension.
  (You don't have to animate, but those are overridden by PSPDFKit to properly inform the PSPDFPageViews to re-render. You can also use the default UIScrollView properties and manually call updateRenderView on each visible PSPDFPageView)
  
 - (void)setZoomScale:(float)scale animated:(BOOL)animated;
 - (void)zoomToRect:(CGRect)rect animated:(BOOL)animated;
 - (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
  */
-@interface PSPDFScrollView : UIScrollView <UIScrollViewDelegate, PSPDFLongPressGestureRecognizerDelegate>
+@interface PSPDFScrollView : PSPDFKeyboardAvoidingScrollView <UIScrollViewDelegate, PSPDFLongPressGestureRecognizerDelegate>
 
 // Designated initializer.
 - (id)initWithFrame:(CGRect)frame;
@@ -68,7 +69,7 @@ typedef NS_ENUM(NSInteger, PSPDFShadowStyle) {
 /// If YES, two sites are displayed.
 @property (nonatomic, assign, getter=isDoublePageMode) BOOL doublePageMode;
 
-/// Shows first document page alone. Not relevant in PSPDFPageModeSinge.
+/// Shows first document page alone. Not relevant in PSPDFPageModeSingle.
 @property (nonatomic, assign, getter=isDoublePageModeOnFirstPage) BOOL doublePageModeOnFirstPage;
 
 /// Allow zooming of small documents to screen width/height.
@@ -93,9 +94,6 @@ typedef NS_ENUM(NSInteger, PSPDFShadowStyle) {
 @property (nonatomic, strong, readonly) UITapGestureRecognizer *doubleTapGesture;
 @property (nonatomic, strong, readonly) UILongPressGestureRecognizer *longPressGesture;
 
-/// Disables singleTapGesture for the current ongoing touch.
-- (void)setCurrentTouchEventAsProcessed;
-
 /**
  Hit-Testing
  
@@ -117,6 +115,9 @@ typedef NS_ENUM(NSInteger, PSPDFShadowStyle) {
 // Allows changing the shadow path.
 - (id)pathShadowForView:(UIView *)imgView; // returns CGPathRef
 
+// Creates and sets up the double tap gesture. Override and return nil to remove it.
+- (UITapGestureRecognizer *)createDoubleTapGesture;
+
 @end
 
 @interface PSPDFScrollView (PSPDFInternal)
@@ -134,13 +135,19 @@ typedef NS_ENUM(NSInteger, PSPDFShadowStyle) {
 /// (Used to decide when it's best to tile pages in ContinuousScroll)
 @property (nonatomic, assign, getter=isAnimatingZoomIn, readonly) BOOL animatingZoomIn;
 
-// Internal use for smooth rotations. Don't call unless you know exactly whay you're doing.
+// Internal use for smooth rotations. Don't call unless you know exactly what you're doing.
 - (void)switchPages;
 
 // Call to manually re-center the content.
 - (void)ensureContentIsCentered;
 
+// Update zoomScale from the values set in pdfController
+- (void)updateAllowedZoomScale;
+
 // Return the actual PSPDFPageView behind point.
 - (PSPDFPageView *)pageViewForPoint:(CGPoint)point;
 
 @end
+
+// Round rect to nearest size, if it's close.
+CGRect PSPDFRoundCompoundViewSize(CGRect compoundViewRect, UIView *superview);

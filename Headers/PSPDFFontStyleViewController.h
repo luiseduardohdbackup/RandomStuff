@@ -2,7 +2,7 @@
 //  PSPDFFontStyleViewController.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFBaseViewController.h"
@@ -31,6 +31,6 @@
 @property (nonatomic, strong) UIFont *selectedFont;
 
 /// Delegate after font has been selected.
-@property (nonatomic, weak)	id<PSPDFFontStyleViewControllerDelegate> delegate;
+@property (nonatomic, weak)	IBOutlet id<PSPDFFontStyleViewControllerDelegate> delegate;
 
 @end

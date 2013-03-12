@@ -2,7 +2,7 @@
 //  PSPDFStream.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -32,9 +32,18 @@
 - (size_t)dataLength;
 
 /// File URL from the converted stream.
+///
+/// @warning This might be slow for large streams.
 - (NSURL *)fileURLWithAssetName:(NSString *)assetName document:(PSPDFDocument *)document page:(NSUInteger)page;
 
-/// File URL with generic path. Path needs to be writeable and any directory needs to be created.
+/// File URL with generic path. Path needs to be writable and any directory needs to be created.
+///
+/// @warning This might be slow for large streams.
 - (NSURL *)fileURLWithPath:(NSString *)path;
 
 @end
+
+// Helper, useful when dealing with appearance streams.
+// Returns CGRectZero if stream BBox not found.
+extern CGRect PSPDFBoundingBoxFromStream(CGPDFStreamRef streamRef);
+extern CGAffineTransform PSPDFMatrixFromStream(CGPDFStreamRef streamRef);

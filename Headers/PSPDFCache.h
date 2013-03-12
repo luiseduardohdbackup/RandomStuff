@@ -2,7 +2,7 @@
 //  PSPDFCache.h
 //  PSPDFKit
 //
-//  Copyright 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -43,12 +43,12 @@ typedef NS_ENUM(NSInteger, PSPDFSize) {
 @interface PSPDFCache : NSObject <NSCacheDelegate> 
 
 /// The cache is a singleton.
-+ (PSPDFCache *)sharedCache;
++ (instancetype)sharedCache;
 
 /// Check if all pages of a document are cached.
 - (BOOL)isDocumentCached:(PSPDFDocument *)document size:(PSPDFSize)size;
 
-/// Check if an individouble page of a document is cached.
+/// Check if an individual page of a document is cached.
 - (BOOL)isImageCachedForDocument:(PSPDFDocument *)document page:(NSUInteger)page size:(PSPDFSize)size;
 
 /// Returns cached image of document. If not found, add to TOP of current caching queue.
@@ -70,15 +70,14 @@ typedef NS_ENUM(NSInteger, PSPDFSize) {
 /// Start document caching (update often to improve cache hits). Page starts at 0.
 - (void)cacheDocument:(PSPDFDocument *)aDocument startAtPage:(NSUInteger)startPage size:(PSPDFSize)size;
 
-/// Creates caches for both thumbnails and tiny images. This, together with PSPDFDocument.loadThumbnailsOnMainThread,
-/// will ensure that the user doesn’t see any white pages when showing the document to the user.
+/// Creates caches for both thumbnails and tiny images.
 ///
 /// Preloading the cache for PSPDFSizeNative would not be efficient. These images tend to become large in data size,
 /// which would in turn trigger the OS’ cache cleaning sooner.
 ///
 /// Note that PSPDFViewController will cache images in PSPDFSizeNative.
 ///
-/// Returns wether or not any preloading has to be done.
+/// Returns whether or not any preloading has to be done.
 - (BOOL)cacheThumbnailsForDocument:(PSPDFDocument *)aDocument;
 
 /// Stop document caching.

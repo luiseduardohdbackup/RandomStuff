@@ -2,7 +2,7 @@
 //  PSPDFOutlineCell.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -21,10 +21,10 @@
 @interface PSPDFOutlineCell : UITableViewCell
 
 /// Dynamically calculates the height for a cell.
-+ (CGFloat)heightForCellWithOutlineElement:(PSPDFOutlineElement *)outlineElement constrainedToSize:(CGSize)constraintSize outlineIntentLeftOffset:(CGFloat)leftOffset outlineIntentMultiplicator:(CGFloat)multiplicator;
++ (CGFloat)heightForCellWithOutlineElement:(PSPDFOutlineElement *)outlineElement constrainedToSize:(CGSize)constraintSize outlineIntentLeftOffset:(CGFloat)leftOffset outlineIntentMultiplier:(CGFloat)multiplier;
 
 /// Delegate for cell button.
-@property (nonatomic, weak) id<PSPDFOutlineCellDelegate> delegate;
+@property (nonatomic, weak) IBOutlet id<PSPDFOutlineCellDelegate> delegate;
 
 /// Single outline element.
 @property (nonatomic, strong) PSPDFOutlineElement *outlineElement;
@@ -49,6 +49,6 @@
 @property (nonatomic, assign) CGFloat outlineIntentLeftOffset;
 
 /// Defaults to 15.f. Should be changed on PSPDFOutlineViewController.
-@property (nonatomic, assign) CGFloat outlineIndentMultiplicator;
+@property (nonatomic, assign) CGFloat outlineIndentMultiplier;
 
 @end

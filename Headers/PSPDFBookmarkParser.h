@@ -2,7 +2,7 @@
 //  PSPDFBookmarkParser.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -53,7 +53,7 @@ extern NSString *const kPSPDFBookmarksChangedNotification;
 @interface PSPDFBookmarkParser (SubclassingHooks)
 
 /// Defaults to document.cacheDirectory/document.uid
-/// documemt.cacheDirectory can be changed w/o subclassing PSPDFBookmarkParser.
+/// document.cacheDirectory can be changed w/o subclassing PSPDFBookmarkParser.
 - (NSString *)cachePath;
 
 /// Defaults to cachePath/bookmarks.plist

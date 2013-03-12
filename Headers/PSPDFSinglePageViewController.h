@@ -2,7 +2,7 @@
 //  PSPDFSinglePageViewController.h
 //  PSPDFKit
 //
-//  Copyright (c) 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -41,7 +41,7 @@
 @property (nonatomic, assign) BOOL useSolidBackground;
 
 /// Delegate (usually connected to a PSPDFPageViewController)
-@property (nonatomic, assign) id<PSPDFSinglePageViewControllerDelegate> delegate;
+@property (nonatomic, assign) IBOutlet id<PSPDFSinglePageViewControllerDelegate> delegate;
 
 @end
 

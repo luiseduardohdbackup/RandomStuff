@@ -1,8 +1,8 @@
 //
-//  PSPDFTextAnnotationController.h
+//  PSPDFNoteAnnotationController.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -30,7 +30,7 @@
 /// For Note annotations, special options will be displayed.
 @interface PSPDFNoteAnnotationController : PSPDFBaseViewController <PSPDFStyleable>
 
-/// Designated initalizer.
+/// Designated Initializer.
 - (id)initWithAnnotation:(PSPDFAnnotation *)annotation editable:(BOOL)allowEditing;
 
 /// Attached annotation.
@@ -48,8 +48,12 @@
 /// Is created in init to be easily customizable.
 @property (nonatomic, strong, readonly) UITextView *textView;
 
+/// Set a global block that allows to customize the UITextView and other properties of PSPDFNoteAnnotationController.
+/// Will be called in viewWillAppear. This is the best way to customize the font.
++ (void)setTextViewCustomizationBlock:(void(^)(PSPDFNoteAnnotationController *))block;
+
 /// Attached delegate.
-@property (nonatomic, weak) id<PSPDFNoteAnnotationControllerDelegate> delegate;
+@property (nonatomic, weak) IBOutlet id<PSPDFNoteAnnotationControllerDelegate> delegate;
 
 @end
 

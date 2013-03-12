@@ -2,7 +2,7 @@
 //  PSPDFHSVColorPickerController.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFBaseViewController.h"
@@ -29,6 +29,6 @@
 @property (nonatomic, strong, readonly) PSPDFBrightnessSlider *brightnessSlider;
 
 /// Action delegate.
-@property (nonatomic, weak) id <PSPDFColorSelectionViewControllerDelegate> delegate;
+@property (nonatomic, weak) IBOutlet id<PSPDFColorSelectionViewControllerDelegate> delegate;
 
 @end

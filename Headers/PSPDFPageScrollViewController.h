@@ -2,7 +2,7 @@
 //  PSPDFPageScrollViewController.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFBaseViewController.h"
@@ -36,7 +36,7 @@
 /// Set Page, animated.
 - (void)setPage:(NSUInteger)page animated:(BOOL)animated;
 
-/// Explictely reload the view.
+/// Explicitly reload the view.
 - (void)reloadData;
 
 @end

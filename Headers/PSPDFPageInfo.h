@@ -2,7 +2,7 @@
 //  PSPDFPageInfo.h
 //  PSPDFKit
 //
-//  Copyright 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -16,7 +16,7 @@
 - (id)initWithPage:(NSUInteger)page rect:(CGRect)pageRect rotation:(NSInteger)rotation documentProvider:(PSPDFDocumentProvider *)documentProvider;
 
 /// Saved aspect ratio of current page.
-@property (nonatomic, assign, readonly) CGRect pageRect;
+@property (nonatomic, assign) CGRect pageRect;
 
 /// Returns corrected, rotated bounds of pageRect. Is calculated on the fly.
 @property (nonatomic, assign, readonly) CGRect rotatedPageRect;

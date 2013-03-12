@@ -2,16 +2,14 @@
 //  PSPDFThumbnailGridViewCell.h
 //  PSPDFKit
 //
-//  Copyright 2011-2012 Peter Steinberger. All rights reserved.
+//  Copyright 2011-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
+#import "PSPDFRoundedLabel.h"
 #import "PSTCollectionViewCell.h"
 
-// if own thumbs are provided and they are larger than the cell, apply shrinking before setting
-#define kPSPDFShrinkOwnImagesTresholdFactor 1.5
-
-/// Thumbnail cell.
+/// Simple thumbnail cell.
 @interface PSPDFThumbnailGridViewCell : PSUICollectionViewCell <PSPDFCacheDelegate>
 
 /// Referenced document.
@@ -27,7 +25,7 @@
 @property (nonatomic, assign, getter=isShadowEnabled) BOOL shadowEnabled;
 
 /// Enable page label.
-@property (nonatomic, assign, getter=isShowingSiteLabel) BOOL showingSiteLabel;
+@property (nonatomic, assign, getter=isShowingPageLabel) BOOL showingPageLabel;
 
 /// Call before re-showing (will update bookmark status)
 - (void)updateCell;
@@ -40,8 +38,8 @@
 /// Internal image view.
 @property (nonatomic, strong) UIImageView *imageView;
 
-/// Site label.
-@property (nonatomic, strong) UILabel *siteLabel;
+/// Page label. (By default a PSPDFRoundedLabel, but can be set to any UILabel subclass, simply do a cast)
+@property (nonatomic, strong) PSPDFRoundedLabel *pageLabel;
 
 /// Creates the shadow. Subclass to change. Returns a CGPathRef.
 - (id)pathShadowForView:(UIView *)imgView;
@@ -49,12 +47,14 @@
 /// Manually set image. use if you override class.
 - (void)setImage:(UIImage *)image animated:(BOOL)animated;
 
-/// Called when cell resizes. use in override class to re-positionize your content.
+/// Called when cell resizes. use in override class to re-position your content.
 - (void)setImageSize:(CGSize)imageSize;
 
 /// Internal static queue for thumbnail parsing.
 + (NSOperationQueue *)thumbnailQueue;
 
-- (void)updateSiteLabel;
+/// Updates the page label.
+- (void)updatePageLabel;
 
 @end
+

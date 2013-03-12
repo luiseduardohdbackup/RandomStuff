@@ -1,4 +1,4 @@
-// PSPDFAttributedLabel.h (originated as TTTAttributedLabel, renamed to prvevent naming conflicts)
+// PSPDFAttributedLabel.h (originated as TTTAttributedLabel, renamed to prevent naming conflicts)
 //
 // Copyright (c) 2011-2012 Mattt Thompson (http://mattt.me)
 // 
@@ -68,7 +68,7 @@ typedef NS_ENUM(NSInteger, PSPDFAttributedLabelVerticalAlignment) {
  
  @discussion A `PSPDFAttributedLabel` delegate responds to messages sent by tapping on links in the label. You can use the delegate to respond to links referencing a URL, address, phone number, date, or date with a specified time zone and duration.
  */
-@property (nonatomic, weak) id <PSPDFAttributedLabelDelegate> delegate;
+@property (nonatomic, weak) IBOutlet id <PSPDFAttributedLabelDelegate> delegate;
 
 ///--------------------------------------------
 /// @name Detecting, Accessing, & Styling Links
@@ -89,12 +89,12 @@ typedef NS_ENUM(NSInteger, PSPDFAttributedLabelVerticalAlignment) {
 /**
  A dictionary containing the `NSAttributedString` attributes to be applied to links detected or manually added to the label text. The default link style is blue and underlined.
  
- @warning You must specify `linkAttributes` before setting autodecting or manually-adding links for these attributes to be applied.
+ @warning You must specify `linkAttributes` before setting autodetecting or manually-adding links for these attributes to be applied.
  */
 @property (nonatomic, copy) NSDictionary *linkAttributes;
 
 ///---------------------------------------
-/// @name Acccessing Text Style Attributes
+/// @name Accessing Text Style Attributes
 ///---------------------------------------
 
 /**
@@ -103,7 +103,7 @@ typedef NS_ENUM(NSInteger, PSPDFAttributedLabelVerticalAlignment) {
 @property (nonatomic, assign) CGFloat shadowRadius;
 
 ///--------------------------------------------
-/// @name Acccessing Paragraph Style Attributes
+/// @name Accessing Paragraph Style Attributes
 ///--------------------------------------------
 
 /**
@@ -261,7 +261,7 @@ typedef NS_ENUM(NSInteger, PSPDFAttributedLabelVerticalAlignment) {
  Tells the delegate that the user did select a link to a date.
  
  @param label The label whose link was selected.
- @param date The datefor the selected link.
+ @param date The date for the selected link.
  */
 - (void)attributedLabel:(PSPDFAttributedLabel *)label didSelectLinkWithDate:(NSDate *)date;
 

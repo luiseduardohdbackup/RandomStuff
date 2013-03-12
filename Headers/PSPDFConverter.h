@@ -2,7 +2,7 @@
 //  PSPDFConverter.h
 //  PSPDFKit
 //
-//  Copyright (c) 2012 Peter Steinberger. All rights reserved.
+//  Copyright (c) 2012-2013 Peter Steinberger. All rights reserved.
 //
 
 #import "PSPDFKitGlobal.h"
@@ -11,6 +11,7 @@
 
 /// Get string from CGPDFDictionary.
 extern inline NSString *PSPDFDictionaryGetString(CGPDFDictionaryRef pdfDict, NSString *key);
+extern inline NSString *PSPDFDictionaryGetStringC(CGPDFDictionaryRef pdfDict, const char *key);
 
 /// Get string from CGPDFArray.
 extern inline NSString *PSPDFArrayGetString(CGPDFArrayRef pdfArray, size_t index);
@@ -19,7 +20,10 @@ extern inline NSString *PSPDFArrayGetString(CGPDFArrayRef pdfArray, size_t index
 extern id PSPDFDictionaryGetObjectForPath(CGPDFDictionaryRef pdfDict, NSString *keyPath);
 
 /// Like PSPDFDictionaryGetObjectForPath, but type safe.
+id PSPDFDictionaryGetObjectForPathOfType(CGPDFDictionaryRef pdfDict, NSString *keyPath, Class returnClass);
 extern PSPDFStream *PSPDFDictionaryGetStreamForPath(CGPDFDictionaryRef pdfDict, NSString *keyPath);
+extern NSNumber *PSPDFDictionaryGetNumberForPath(CGPDFDictionaryRef pdfDict, NSString *keyPath);
+extern NSString *PSPDFDictionaryGetStringForPath(CGPDFDictionaryRef pdfDict, NSString *keyPath);
 
 /// Convert a single PDF object to the corresponding CoreFoundation-object.
 extern id PSPDFConvertPDFObject(CGPDFObjectRef objectRef);
@@ -32,12 +36,6 @@ extern NSDictionary *PSPDFConvertPDFDictionary(CGPDFDictionaryRef pdfDict);
 
 /// Converts a CGPDFArray into an NSArray.
 extern NSArray *PSPDFConvertPDFArray(CGPDFArrayRef pdfArray);
-
-/// Converts a string formatted after PDF Reference 7.9.4 to an NSDate.
-extern NSDate *PSPDFDateFromString(NSString *pdfDateString);
-
-/// Converts a NSDate to a PDF string formatted after PDF Reference 7.9.4.
-extern NSString *PSPDFStringFromDate(NSDate *date);
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +60,7 @@ extern CGFloat PSPDFScaleForSizeWithinSizeWithOptions(CGSize targetSize, CGSize 
 /// helper to calculate new size for specific scale and size.
 extern CGSize PSPDFSizeForScale(CGSize size, CGFloat scale);
 
-/// Helper that aligns rectables depending on PSPDFRectAlignment. (usually used to center)
+/// Helper that aligns rectangles depending on PSPDFRectAlignment. (usually used to center)
 extern CGRect PSPDFAlignRectangles(CGRect alignee, CGRect aligner, PSPDFRectAlignment alignment);
 
 /// Alignment helper that allows offsets.
